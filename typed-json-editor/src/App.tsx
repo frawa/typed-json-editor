@@ -14,7 +14,7 @@ export function App(): React.ReactElement {
       <div className="column">
         <h1>Schema Editor</h1>
         <div className="monaco-container" id="editorSchema">
-          {/*<Editor />*/}
+          <Editor />
         </div>
         <label htmlFor="sample-schema">Try one of these:</label>
         <select name="sample-schema" id="sample-schema">
