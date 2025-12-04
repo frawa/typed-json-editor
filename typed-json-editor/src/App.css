@@ -1,0 +1,19 @@
+h1 {
+    color: darkgray;
+    font-family: sans-serif;
+}
+
+.page {
+    display: flex;
+}
+
+.column {
+    width: 50%;
+    height: 100%;
+}
+
+.monaco-container {
+    /*width: 500px;*/
+    height: 400px;
+    border: 1px solid #ccc;
+}
