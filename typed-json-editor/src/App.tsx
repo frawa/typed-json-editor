@@ -3,7 +3,7 @@ import "./App.css";
 import { Editor } from "./components/Editor";
 
 export function App(): React.ReactElement {
-  const [value, setValue] = useState(toJsonString(initialValue));
+  const [value] = useState(toJsonString(initialValue));
   const [schema, setSchema] = useState(toJsonString(initialSchema));
 
 

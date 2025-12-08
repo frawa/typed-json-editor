@@ -15,6 +15,7 @@ import 'monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js'
 import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js'
 import 'monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js'
 import 'monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js'
+import { enableTypedJson } from "./typedJson";
 
 interface EditorProps {
   readonly value: string;
@@ -84,6 +85,15 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
     },
     [],
   );
+
+  useEffect(() => {
+    if (editor.current) {
+      const typedJson = enableTypedJson(editor.current.getModel());
+      return () => {
+        typedJson.dispose();
+      }
+    }
+  }, [])
 
   return <div className={styles.Editor} ref={containerElement}></div>;
 };
