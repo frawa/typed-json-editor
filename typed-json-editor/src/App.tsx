@@ -1,23 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { Editor } from "./components/Editor";
 
 export function App(): React.ReactElement {
+  const [value, setValue] = useState(toJsonString(initialValue));
+  const [schema, setSchema] = useState(toJsonString(initialSchema));
+
+
+  const setSampleSchema = (id: string) => {
+    const s = (sampleSchemas as any)[id] ?? initialSchema
+    setSchema(toJsonString(s))
+  }
+
   return (
     <div className="page">
       <div className="column">
         <h1>Json Editor</h1>
         <div className="monaco-container" id="editor">
-          <Editor value={initialJson} />
+          <Editor value={value} />
         </div>
       </div>
       <div className="column">
         <h1>Schema Editor</h1>
         <div className="monaco-container" id="editorSchema">
-          <Editor value={initialSchema} />
+          <Editor value={schema} />
         </div>
         <label htmlFor="sample-schema">Try one of these:</label>
-        <select name="sample-schema" id="sample-schema">
+        <select name="sample-schema" id="sample-schema" onChange={(e) => setSampleSchema(e.target.value)}>
           <option value=""></option>
           <option value="properties">Properties</option>
           <option value="if-then-else">If/Then/Else</option>
@@ -28,9 +37,51 @@ export function App(): React.ReactElement {
   );
 }
 
-const initialJson = `{
+const initialValue = {
   "hello": "world"
-}`;
-const initialSchema = `{
+};
+
+const initialSchema = {
   "type": "boolean"
-}`;
+};
+
+const sampleSchemas = {
+  "properties": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+      "foo": { "type": "array", "maxItems": 3 },
+      "bar": { "type": "array" }
+    },
+    "patternProperties": { "f.o": { "minItems": 2 } },
+    "additionalProperties": { "type": "integer" }
+  },
+  "if-then-else": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "then": { "const": "yes" },
+    "else": { "const": "other" },
+    "if": { "maxLength": 4 }
+  },
+  "all-of": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": { "bar": { "type": "integer" } },
+    "required": ["bar"],
+    "allOf": [
+      {
+        "properties": {
+          "foo": { "type": "string" }
+        },
+        "required": ["foo"]
+      },
+      {
+        "properties": {
+          "baz": { "type": "null" }
+        },
+        "required": ["baz"]
+      }
+    ]
+  }
+}
+
+function toJsonString(v: any): string {
+  return JSON.stringify(v, null, 2)
+}

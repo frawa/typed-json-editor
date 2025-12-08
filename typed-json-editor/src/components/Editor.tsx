@@ -51,9 +51,10 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
   // and https://github.com/vitejs/vite/discussions/1791
 
+  const { value, options } = props;
+
   const initMonaco = () => {
     if (containerElement.current) {
-      const { value, options } = props;
 
       const model = monaco.editor.createModel(value, "json");
 
@@ -68,6 +69,12 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   }
 
   useEffect(initMonaco, []);
+
+  useEffect(() => {
+    if (editor.current && editor.current.getValue() !== value) {
+      editor.current.setValue(value)
+    }
+  }, [value])
 
   useEffect(
     () => () => {
