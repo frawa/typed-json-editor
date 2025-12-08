@@ -1,29 +1,82 @@
-import { VFC, useRef, useState, useEffect } from "react";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import * as monaco from "monaco-editor";
+//import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+
+import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
+import "./userWorker";
 
-export const Editor: VFC = () => {
-  const [editor, setEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const monacoEl = useRef(null);
+import 'monaco-editor/esm/vs/editor/browser/coreCommands.js'
+import 'monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js'
+import 'monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js'
+import 'monaco-editor/esm/vs/editor/contrib/find/browser/findController.js'
+import 'monaco-editor/esm/vs/editor/contrib/hover/browser/getHover.js'
+import 'monaco-editor/esm/vs/editor/contrib/linesOperations/browser/linesOperations.js'
+import 'monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js'
+import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js'
+import 'monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js'
+import 'monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js'
 
-  useEffect(() => {
-    if (monacoEl) {
-      setEditor((editor) => {
-        if (editor) return editor;
+interface EditorProps {
+  readonly value: string;
+  readonly options?: monaco.editor.IEditorOptions;
+}
 
-        return monaco.editor.create(monacoEl.current!, {
-          value: [
-            "{ asdf asdf asd asdf asdfadf }",
-            "{ asdf asdf asd asdf asdfadf }",
-          ].join("\n"),
-          language: "json",
-        });
+const defaultOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
+  automaticLayout: true,
+  // automaticLayout: false,
+  minimap: {
+    enabled: false,
+  },
+  bracketPairColorization: {
+    enabled: true,
+  },
+  suggest: {
+    preview: true,
+    previewMode: "subwordSmart",
+  },
+  //theme: "vs-dark",
+  theme: "vs",
+  formatOnType: true,
+  glyphMargin: false,
+  lightbulb: {
+    // enabled: On,
+  },
+  'semanticHighlighting.enabled': true,
+};
+
+export const Editor: FC<EditorProps> = (props: EditorProps) => {
+  const containerElement = useRef<HTMLDivElement | null>(null);
+  const editor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
+  // and https://github.com/vitejs/vite/discussions/1791
+
+  const initMonaco = () => {
+    if (containerElement.current) {
+      const { value, options } = props;
+
+      const model = monaco.editor.createModel(value, "json");
+
+      const editor1 = monaco.editor.create(containerElement.current, {
+        model,
+        ...defaultOptions,
+        ...options,
       });
+
+      editor.current = editor1;
     }
+  }
 
-    return () => editor?.dispose();
-  }, [monacoEl.current]);
+  useEffect(initMonaco, []);
 
-  return <div className={styles.Editor} ref={monacoEl}></div>;
+  useEffect(
+    () => () => {
+      if (editor.current) {
+        editor.current.dispose();
+      }
+    },
+    [],
+  );
+
+  return <div className={styles.Editor} ref={containerElement}></div>;
 };

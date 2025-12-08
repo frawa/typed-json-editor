@@ -8,13 +8,13 @@ export function App(): React.ReactElement {
       <div className="column">
         <h1>Json Editor</h1>
         <div className="monaco-container" id="editor">
-          <Editor />
+          <Editor value={initialJson} />
         </div>
       </div>
       <div className="column">
         <h1>Schema Editor</h1>
         <div className="monaco-container" id="editorSchema">
-          <Editor />
+          <Editor value={initialSchema} />
         </div>
         <label htmlFor="sample-schema">Try one of these:</label>
         <select name="sample-schema" id="sample-schema">
@@ -27,3 +27,10 @@ export function App(): React.ReactElement {
     </div>
   );
 }
+
+const initialJson = `{
+  "hello": "world"
+}`;
+const initialSchema = `{
+  "type": "boolean"
+}`;
