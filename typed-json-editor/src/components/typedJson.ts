@@ -26,9 +26,7 @@ export function enableTypedJson(model: editor.ITextModel | null) {
                     insertText: 'dummy insertText',
                     range
                 };
-                return {
-                    suggestions: [dummy],
-                };
+                return Promise.resolve({ suggestions: [dummy] })
             }
         },
     });
