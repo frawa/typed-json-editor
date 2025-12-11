@@ -9,7 +9,7 @@ import {
   JSONDocument,
   TextDocument,
 } from "vscode-json-languageservice";
-import { getSuggestPosAt } from "./typedJsonUtil";
+import { getPointerOffsets, getSuggestPosAt } from "./typedJsonUtil";
 
 describe("typedJson utils", () => {
   const jsonLanguageService = getLanguageService({});
@@ -164,5 +164,40 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(8, doc)).toEqual(expected3);
     expect(getSuggestPosAt(9, doc)).toEqual(expected0);
     expect(getSuggestPosAt(10, doc)).toEqual(undefined);
+  });
+
+  test("offsets for broken pointer", () => {
+    const value = "13";
+    const doc = parse(value);
+    expect(getPointerOffsets("broken", doc)).toEqual(undefined);
+  });
+
+  test("offsets for pointer", () => {
+    const value = "13";
+    const doc = parse(value);
+    expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 2 });
+  });
+  test("offsets for array", () => {
+    const value = "[13,14]";
+    const doc = parse(value);
+    expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 7 });
+    expect(getPointerOffsets("/0", doc)).toEqual({ offset: 1, length: 2 });
+    expect(getPointerOffsets("/1", doc)).toEqual({ offset: 4, length: 2 });
+    expect(getPointerOffsets("/13", doc)).toEqual(undefined);
+  });
+  test("offsets for object", () => {
+    const value = '{"foo":13}';
+    const doc = parse(value);
+    expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 10 });
+    expect(getPointerOffsets("/foo", doc)).toEqual({ offset: 7, length: 2 });
+    expect(getPointerOffsets("/1", doc)).toEqual(undefined);
+    expect(getPointerOffsets("/bar", doc)).toEqual(undefined);
+  });
+  test("offsets for broken object", () => {
+    const value = '{"foo":}';
+    const doc = parse(value);
+    expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 8 });
+    expect(getPointerOffsets("/foo", doc)).toEqual({ offset: 1, length: 5 });
+    expect(getPointerOffsets("/bar", doc)).toEqual(undefined);
   });
 });

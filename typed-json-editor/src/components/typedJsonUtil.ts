@@ -31,6 +31,26 @@ export function getSuggestPosAt(
   }
 }
 
+export type Offsets = {
+  readonly offset: number;
+  readonly length: number;
+};
+
+export function getPointerOffsets(
+  pointer: string,
+  doc: JSONDocument,
+): Offsets | undefined {
+  if (!pointer.startsWith("/") || !doc.root) {
+    return undefined;
+  } else if (pointer === "/") {
+    return { offset: doc.root.offset, length: doc.root.length };
+  } else {
+    const path = pointer.split("/").splice(1);
+    console.log("FW", path);
+    return getPathOffsets(path, doc.root);
+  }
+}
+
 // need to re-implement doc.getNodeFromOffset,
 // 'cause the client-side objects are different from the worker-side.
 
@@ -100,4 +120,28 @@ function prependPath(parent: ASTNode, node: ASTNode, pos: PathPos): PathPos {
       return parent.parent ? prependPath(parent.parent, parent, pos) : pos;
     }
   }
+}
+
+function getPathOffsets(
+  path: string[],
+  n: ASTNode | undefined,
+): Offsets | undefined {
+  if (n) {
+    if (path.length === 0) {
+      return { offset: n.offset, length: n.length };
+    }
+    const [head, ...tail] = path;
+    switch (n.type) {
+      case "array": {
+        const i = Number.parseInt(head);
+        return getPathOffsets(tail, n.items[i]);
+      }
+      case "object": {
+        const prop = n.properties.find((p) => p.keyNode.value === head);
+        const v = prop?.valueNode ?? prop?.keyNode;
+        return getPathOffsets(tail, v);
+      }
+    }
+  }
+  return undefined;
 }
