@@ -43,6 +43,10 @@ describe("typedJson utils", () => {
       replaceOffset: 0,
       replaceLength: 7,
     };
+    const expected0b = {
+      ...expected0,
+      inside: true,
+    };
     const expected1 = {
       pointer: "/0",
       inside: false,
@@ -58,7 +62,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(0, doc)).toEqual(expected0);
     expect(getSuggestPosAt(1, doc)).toEqual(expected1);
     expect(getSuggestPosAt(2, doc)).toEqual(expected1);
-    expect(getSuggestPosAt(3, doc)).toEqual(expected0); // TODO inside true
+    expect(getSuggestPosAt(3, doc)).toEqual(expected0b); // TODO inside true
     expect(getSuggestPosAt(4, doc)).toEqual(expected2);
     expect(getSuggestPosAt(5, doc)).toEqual(expected2);
     expect(getSuggestPosAt(6, doc)).toEqual(expected0);
@@ -96,6 +100,10 @@ describe("typedJson utils", () => {
       replaceOffset: 0,
       replaceLength: 7,
     };
+    const expected0b = {
+      ...expected0,
+      inside: true,
+    };
     const expected1 = {
       pointer: "/0",
       inside: false,
@@ -111,8 +119,8 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(0, doc)).toEqual(expected0);
     expect(getSuggestPosAt(1, doc)).toEqual(expected1);
     expect(getSuggestPosAt(2, doc)).toEqual(expected1);
-    expect(getSuggestPosAt(3, doc)).toEqual(expected0);
-    expect(getSuggestPosAt(4, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected0b);
+    expect(getSuggestPosAt(4, doc)).toEqual(expected0b);
     expect(getSuggestPosAt(5, doc)).toEqual(expected2);
     expect(getSuggestPosAt(6, doc)).toEqual(expected2);
     expect(getSuggestPosAt(7, doc)).toEqual(undefined);
@@ -135,7 +143,7 @@ describe("typedJson utils", () => {
     };
     const expected2 = {
       pointer: "/",
-      inside: false,
+      inside: true,
       replaceOffset: 1,
       replaceLength: 8,
     };
