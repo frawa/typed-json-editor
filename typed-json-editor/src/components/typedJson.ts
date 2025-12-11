@@ -1,6 +1,6 @@
 import { languages, editor, json } from "monaco-editor";
 import { Range } from "monaco-editor/esm/vs/editor/editor.api";
-import { getPathAt } from "./typedJsonUtil";
+import { getSuggestPosAt } from "./typedJsonUtil";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -16,8 +16,8 @@ export function enableTypedJson(model: editor.ITextModel | null) {
 
       const doc = await worker.parseJSONDocument(m.uri.toString());
       const offset = m.getOffsetAt(position);
-      debugger;
-      const path = doc ? getPathAt(offset, doc) : "?"
+      // debugger;
+      const path = doc ? getSuggestPosAt(offset, doc) : "?"
       console.log("FW", offset, path);
 
       const result = null;

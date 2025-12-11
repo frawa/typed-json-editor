@@ -1,18 +1,25 @@
 import { ASTNode, JSONDocument } from "vscode-json-languageservice";
-import { getNodePath } from "vscode-json-languageservice/lib/esm/parser/jsonParser.js";
+// import { getNodePath } from "vscode-json-languagesefrvice/lib/esm/parser/jsonParser.js";
 
+export interface SuggestPos {
+  readonly pointer: string;
+  readonly inside: boolean;
+  readonly replaceOffset: number;
+  readonly replaceLength: number;
+}
 
-export function getPathAt(offset: number, doc: JSONDocument): string {
+export function getSuggestPosAt(offset: number, doc: JSONDocument): SuggestPos | undefined {
   // original, used to define green tests
   // const node = doc.getNodeFromOffset(offset)
   const node = clientGetNodeFromOffset(offset, doc.root)
   if (node) {
     // original, used to define green tests
     // const path = getNodePath(node);
-    const path = clientGetNodePath(node);
-    return "/" + path.join("/");
+    const { path, inside } = getPathPos(node);
+    const pointer = '/' + path.join('/')
+    return { pointer, inside, replaceOffset: node.offset, replaceLength: node.length };
   } else {
-    return ""
+    return undefined
   }
 }
 
@@ -52,28 +59,30 @@ function findNodeInChildren(offset: number, cs: ASTNode[]): ASTNode | undefined 
   return undefined;
 }
 
-function clientGetNodePath(n: ASTNode): (string | number)[] {
-  if (n.parent) {
-    return prependPath(n.parent, n, [])
-  }
-  return []
+type PathPos = { path: (string | number)[], inside: boolean }
+
+function getPathPos(n: ASTNode): PathPos {
+  // const inside = n.type === 'array' || n.type === 'object'
+  const pos = { path: [], inside: false }
+  return n.parent
+    ? prependPath(n.parent, n, pos)
+    : pos;
 }
 
-function prependPath(parent: ASTNode, node: ASTNode, path: (string | number)[]): (string | number)[] {
+function prependPath(parent: ASTNode, node: ASTNode, pos: PathPos): PathPos {
   switch (parent.type) {
     case "array": {
       const i = parent.items.indexOf(node);
-      const path1 = [i, ...path]
-      return parent.parent ? prependPath(parent.parent, parent, path1) : path1;
+      const pos1 = { ...pos, path: [i, ...pos.path] }
+      return parent.parent ? prependPath(parent.parent, parent, pos1) : pos1;
     }
     case 'property': {
-      // TODO need key vs value?
-      // parent.keyNode === node 
-      const path1 = [parent.keyNode.value, ...path]
-      return parent.parent ? prependPath(parent.parent, parent, path1) : path1;
+      const inside = parent.keyNode === node || pos.inside
+      const pos1 = { path: [parent.keyNode.value, ...pos.path], inside }
+      return parent.parent ? prependPath(parent.parent, parent, pos1) : pos1;
     }
     default: {
-      return parent.parent ? prependPath(parent.parent, parent, path) : path;
+      return parent.parent ? prependPath(parent.parent, parent, pos) : pos;
     }
   }
 }

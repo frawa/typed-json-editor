@@ -9,7 +9,7 @@ import {
   JSONDocument,
   TextDocument,
 } from "vscode-json-languageservice";
-import { getPathAt } from "./typedJsonUtil";
+import { getSuggestPosAt } from "./typedJsonUtil";
 
 describe("typedJson utils", () => {
   const jsonLanguageService = getLanguageService({});
@@ -23,62 +23,138 @@ describe("typedJson utils", () => {
   test("paths for number", () => {
     const value = "13";
     const doc = parse(value);
-    expect(getPathAt(0, doc)).toEqual("/");
-    expect(getPathAt(1, doc)).toEqual("/");
-    expect(getPathAt(2, doc)).toEqual("");
+    const expected = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 2,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected);
+    expect(getSuggestPosAt(2, doc)).toEqual(undefined);
   });
 
   test("paths for array", () => {
     const value = "[13,14]";
     const doc = parse(value);
-    expect(getPathAt(0, doc)).toEqual("/");
-    expect(getPathAt(1, doc)).toEqual("/0");
-    expect(getPathAt(2, doc)).toEqual("/0");
-    expect(getPathAt(3, doc)).toEqual("/");
-    expect(getPathAt(4, doc)).toEqual("/1");
-    expect(getPathAt(5, doc)).toEqual("/1");
-    expect(getPathAt(6, doc)).toEqual("/");
-    expect(getPathAt(7, doc)).toEqual("");
-    expect(getPathAt(8, doc)).toEqual("");
+    const expected0 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 7,
+    };
+    const expected1 = {
+      pointer: "/0",
+      inside: false,
+      replaceOffset: 1,
+      replaceLength: 2,
+    };
+    const expected2 = {
+      pointer: "/1",
+      inside: false,
+      replaceOffset: 4,
+      replaceLength: 2,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected0); // TODO inside true
+    expect(getSuggestPosAt(4, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(5, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(7, doc)).toEqual(undefined);
+    expect(getSuggestPosAt(8, doc)).toEqual(undefined);
   });
 
   test("paths for broken array", () => {
     const value = "[13";
     const doc = parse(value);
-    expect(getPathAt(0, doc)).toEqual("/");
-    expect(getPathAt(1, doc)).toEqual("/0");
-    expect(getPathAt(2, doc)).toEqual("/0");
-    expect(getPathAt(3, doc)).toEqual("");
+    const expected0 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 3,
+    };
+    const expected1 = {
+      pointer: "/0",
+      inside: false,
+      replaceOffset: 1,
+      replaceLength: 2,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(undefined);
   });
 
   test("paths for broken array with more elements", () => {
     const value = "[13,,14";
     const doc = parse(value);
-    expect(getPathAt(0, doc)).toEqual("/");
-    expect(getPathAt(1, doc)).toEqual("/0");
-    expect(getPathAt(2, doc)).toEqual("/0");
-    expect(getPathAt(3, doc)).toEqual("/");
-    expect(getPathAt(4, doc)).toEqual("/");
-    expect(getPathAt(5, doc)).toEqual("/1");
-    expect(getPathAt(6, doc)).toEqual("/1");
-    expect(getPathAt(7, doc)).toEqual("");
-    expect(getPathAt(8, doc)).toEqual("");
-    expect(getPathAt(9, doc)).toEqual("");
+    const expected0 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 7,
+    };
+    const expected1 = {
+      pointer: "/0",
+      inside: false,
+      replaceOffset: 1,
+      replaceLength: 2,
+    };
+    const expected2 = {
+      pointer: "/1",
+      inside: false,
+      replaceOffset: 5,
+      replaceLength: 2,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(4, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(5, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(7, doc)).toEqual(undefined);
   });
 
   test("paths for object", () => {
     const value = '{"foo":13}';
     const doc = parse(value);
-    // expect(getPathAt(0, doc)).toEqual("/");
-    expect(getPathAt(1, doc)).toEqual("/foo");
-    expect(getPathAt(2, doc)).toEqual("/foo");
-    expect(getPathAt(3, doc)).toEqual("/foo");
-    expect(getPathAt(4, doc)).toEqual("/foo");
-    expect(getPathAt(5, doc)).toEqual("/foo");
-    expect(getPathAt(6, doc)).toEqual("/");
-    expect(getPathAt(7, doc)).toEqual("/foo");
-    expect(getPathAt(8, doc)).toEqual("/foo");
-    expect(getPathAt(9, doc)).toEqual("/");
-    expect(getPathAt(10, doc)).toEqual("");
+    const expected0 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 10,
+    };
+    const expected1 = {
+      pointer: "/foo",
+      inside: true,
+      replaceOffset: 1,
+      replaceLength: 5,
+    };
+    const expected2 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 1,
+      replaceLength: 8,
+    };
+    const expected3 = {
+      pointer: "/foo",
+      inside: false,
+      replaceOffset: 7,
+      replaceLength: 2,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(4, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(5, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(7, doc)).toEqual(expected3);
+    expect(getSuggestPosAt(8, doc)).toEqual(expected3);
+    expect(getSuggestPosAt(9, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(10, doc)).toEqual(undefined);
   });
 });
