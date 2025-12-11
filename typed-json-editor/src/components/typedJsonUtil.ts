@@ -46,7 +46,6 @@ export function getPointerOffsets(
     return { offset: doc.root.offset, length: doc.root.length };
   } else {
     const path = pointer.split("/").splice(1);
-    console.log("FW", path);
     return getPathOffsets(path, doc.root);
   }
 }
