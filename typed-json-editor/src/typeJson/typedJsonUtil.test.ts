@@ -175,11 +175,13 @@ describe("typedJson utils", () => {
   test("offsets for pointer", () => {
     const value = "13";
     const doc = parse(value);
+    expect(getPointerOffsets("", doc)).toEqual({ offset: 0, length: 2 });
     expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 2 });
   });
   test("offsets for array", () => {
     const value = "[13,14]";
     const doc = parse(value);
+    expect(getPointerOffsets("", doc)).toEqual({ offset: 0, length: 7 });
     expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 7 });
     expect(getPointerOffsets("/0", doc)).toEqual({ offset: 1, length: 2 });
     expect(getPointerOffsets("/1", doc)).toEqual({ offset: 4, length: 2 });
@@ -188,6 +190,7 @@ describe("typedJson utils", () => {
   test("offsets for object", () => {
     const value = '{"foo":13}';
     const doc = parse(value);
+    expect(getPointerOffsets("", doc)).toEqual({ offset: 0, length: 10 });
     expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 10 });
     expect(getPointerOffsets("/foo", doc)).toEqual({ offset: 7, length: 2 });
     expect(getPointerOffsets("/1", doc)).toEqual(undefined);
@@ -196,6 +199,7 @@ describe("typedJson utils", () => {
   test("offsets for broken object", () => {
     const value = '{"foo":}';
     const doc = parse(value);
+    expect(getPointerOffsets("", doc)).toEqual({ offset: 0, length: 8 });
     expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 8 });
     expect(getPointerOffsets("/foo", doc)).toEqual({ offset: 1, length: 5 });
     expect(getPointerOffsets("/bar", doc)).toEqual(undefined);
