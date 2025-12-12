@@ -17,13 +17,21 @@ export function App(): React.ReactElement {
       <div className="column">
         <h1>Json Editor</h1>
         <div className="monaco-container" id="editor">
-          <Editor value={value} onChange={updatedInstance} />
+          <Editor
+            value={value}
+            onChange={updatedInstance}
+            options={{ theme: "vs-dark" }}
+          />
         </div>
       </div>
       <div className="column">
         <h1>Schema Editor</h1>
         <div className="monaco-container" id="editorSchema">
-          <Editor value={schema} onChange={updatedSchema} />
+          <Editor
+            value={schema}
+            onChange={updatedSchema}
+            options={{ theme: "vs" }}
+          />
         </div>
         <label htmlFor="sample-schema">Try one of these:</label>
         <select

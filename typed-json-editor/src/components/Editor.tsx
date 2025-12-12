@@ -1,5 +1,5 @@
 import { editor, IDisposable } from "monaco-editor";
-// import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import {} from "monaco-editor/esm/vs/editor/editor.api";
 
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
@@ -19,13 +19,14 @@ import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperation
 
 interface EditorProps {
   readonly value: string;
-  readonly options?: editor.IEditorOptions;
+  readonly options?: editor.IStandaloneEditorConstructionOptions;
   readonly onChange?: (editor: editor.IStandaloneCodeEditor) => void;
 }
 
 const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
-  automaticLayout: true,
+  // automaticLayout: true,
   // automaticLayout: false,
+  // autoDetectHighContrast: false,
   minimap: {
     enabled: false,
   },
@@ -36,12 +37,16 @@ const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
     preview: true,
     previewMode: "subwordSmart",
   },
-  //theme: "vs-dark",
-  theme: "vs",
+  theme: "vs-dark",
+  // theme: "vs",
+  // cursorWidth: 5,
+
+  // cursorBlinking: "solid",
+  // theme: "vs",
   formatOnType: true,
   glyphMargin: false,
   lightbulb: {
-    // enabled: On,
+    // enabled: ShowLightbulbIconMode.On,
   },
   "semanticHighlighting.enabled": true,
 };
@@ -63,9 +68,9 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
       const model = editor.createModel(value, "json");
 
       const editor1 = editor.create(containerRef.current, {
-        model,
-        ...defaultOptions,
         ...options,
+        ...defaultOptions,
+        model,
       });
 
       subscriptionRef.current = editor1.onDidChangeModelContent(() =>
