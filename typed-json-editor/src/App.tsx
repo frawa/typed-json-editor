@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Editor } from "./components/Editor";
-import { getValidation, putSchema } from "./components/typedJson";
+import { getValidation, putSchema } from "./typeJson/typedJson";
 
 export function App(): React.ReactElement {
   const [value] = useState(toJsonString(initialValue));

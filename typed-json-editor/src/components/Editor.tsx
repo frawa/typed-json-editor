@@ -1,9 +1,10 @@
-import * as monaco from "monaco-editor";
+import { editor, IDisposable } from "monaco-editor";
 //import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
 import "./userWorker";
+import { enableTypedJson } from "../typeJson/typedJson";
 
 import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
 import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
@@ -15,15 +16,14 @@ import "monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js";
 import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
 import "monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js";
 import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js";
-import { enableTypedJson } from "./typedJson";
 
 interface EditorProps {
   readonly value: string;
-  readonly options?: monaco.editor.IEditorOptions;
+  readonly options?: editor.IEditorOptions;
   readonly onChange?: (value: string) => void;
 }
 
-const defaultOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
+const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
   // automaticLayout: false,
   minimap: {
@@ -47,9 +47,9 @@ const defaultOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 export const Editor: FC<EditorProps> = (props: EditorProps) => {
-  const containerElement = useRef<HTMLDivElement | null>(null);
-  const editor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const subscription = useRef<monaco.IDisposable>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const subscriptionRef = useRef<IDisposable>(null);
   const onChangeRef = useRef<EditorProps["onChange"]>(null);
   onChangeRef.current = props.onChange;
 
@@ -59,47 +59,49 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   const { value, options } = props;
 
   const initMonaco = () => {
-    if (containerElement.current) {
-      const model = monaco.editor.createModel(value, "json");
+    if (containerRef.current) {
+      const model = editor.createModel(value, "json");
 
-      const editor1 = monaco.editor.create(containerElement.current, {
+      const editor1 = editor.create(containerRef.current, {
         model,
         ...defaultOptions,
         ...options,
       });
 
-      subscription.current = editor1.onDidChangeModelContent(() =>
+      subscriptionRef.current = editor1.onDidChangeModelContent(() =>
         onChangeRef.current?.(editor1.getValue()),
       );
 
-      editor.current = editor1;
+      // editor1.setMo;
+
+      editorRef.current = editor1;
     }
   };
 
   useEffect(initMonaco, []);
 
   useEffect(() => {
-    if (editor.current && editor.current.getValue() !== value) {
-      editor.current.setValue(value);
+    if (editorRef.current && editorRef.current.getValue() !== value) {
+      editorRef.current.setValue(value);
     }
   }, [value]);
 
   useEffect(
     () => () => {
-      subscription.current?.dispose();
-      editor.current?.dispose();
+      subscriptionRef.current?.dispose();
+      editorRef.current?.dispose();
     },
     [],
   );
 
   useEffect(() => {
-    if (editor.current) {
-      const typedJson = enableTypedJson(editor.current.getModel());
+    if (editorRef.current) {
+      const typedJson = enableTypedJson(editorRef.current.getModel());
       return () => {
         typedJson.dispose();
       };
     }
   }, []);
 
-  return <div className={styles.Editor} ref={containerElement}></div>;
+  return <div className={styles.Editor} ref={containerRef}></div>;
 };
