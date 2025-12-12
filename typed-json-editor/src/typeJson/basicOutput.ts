@@ -25,6 +25,7 @@ export function basicOutputToMarkers(
 ): editor.IMarkerData[] {
   return (
     o.errors
+      ?.filter((e) => e.error !== "a sub schema failed")
       ?.map(basicErrorToMarker(model, doc))
       .filter((m) => m !== undefined) ?? []
   );
