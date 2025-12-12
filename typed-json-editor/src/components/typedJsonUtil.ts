@@ -50,6 +50,37 @@ export function getPointerOffsets(
   }
 }
 
+export function toInstance(n: ASTNode): any {
+  switch (n.type) {
+    case "array": {
+      return n.items.map(toInstance);
+    }
+    case "object": {
+      let o: { [key: string]: any } = {};
+      n.properties.forEach((p) => {
+        o[p.keyNode.value] = p.valueNode?.value ?? null;
+      });
+      return o;
+    }
+    case "property": {
+      throw new Error("boom");
+    }
+    case "string": {
+      return JSON.stringify(n.value);
+    }
+    case "number": {
+      return JSON.stringify(n.value);
+    }
+    case "boolean": {
+      return JSON.stringify(n.value);
+    }
+    case "null": {
+      return JSON.stringify(null);
+    }
+  }
+  return {};
+}
+
 // need to re-implement doc.getNodeFromOffset,
 // 'cause the client-side objects are different from the worker-side.
 

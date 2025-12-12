@@ -1,6 +1,7 @@
 import { languages, editor, json } from "monaco-editor";
 import { Range } from "monaco-editor/esm/vs/editor/editor.api";
-import { getSuggestPosAt } from "./typedJsonUtil";
+import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
+import { ASTNode } from "vscode-json-languageservice";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -17,8 +18,15 @@ export function enableTypedJson(model: editor.ITextModel | null) {
       const doc = await worker.parseJSONDocument(m.uri.toString());
       const offset = m.getOffsetAt(position);
       // debugger;
-      const path = doc ? getSuggestPosAt(offset, doc) : "?"
-      console.log("FW", offset, path);
+      if (doc?.root) {
+        const suggestPos = getSuggestPosAt(offset, doc);
+        console.log("FW", offset, suggestPos);
+        const fw =
+          doc.root && suggestPos
+            ? await getSuggestions(doc.root, suggestPos)
+            : [];
+        console.log("FW", fw);
+      }
 
       const result = null;
       if (!result) {
@@ -45,10 +53,58 @@ export function enableTypedJson(model: editor.ITextModel | null) {
   });
 }
 
-function fetchIt() {
-  return fetch("/s/suggest", {
-    method: "GET",
+async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
+  const body = {
+    instance: toInstance(instance),
+    ...pos,
+  };
+  const response = await fetch("/api/suggest", {
+    method: "POST",
+    headers: {
+      // "Content-Type": "application/json",
+    },
     credentials: "include",
-    body: "{}",
+    // credentials: "same-origin",
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    console.log("ERROR fetching suggestions", response.status);
+  }
+  return await response.json();
+}
+
+export async function getValidation(instance: string) {
+  return fetch("/api/validate?output=basic", {
+    method: "POST",
+
+    headers: {
+      // "Content-Type": "application/json",
+    },
+    credentials: "include",
+    // credentials: "same-origin",
+    body: JSON.stringify(instance),
+  }).then((response) => {
+    if (!response.ok) {
+      console.log("ERROR fetching suggestions", response.status);
+    }
+    return response.json();
+  });
+}
+
+export async function putSchema(schema: string) {
+  return fetch("/api/schema", {
+    method: "PUT",
+
+    headers: {
+      // "Content-Type": "application/json",
+    },
+    credentials: "include",
+    // credentials: "same-origin",
+    body: schema,
+  }).then((response) => {
+    if (!response.ok) {
+      console.log("ERROR fetching suggestions", response.status);
+    }
+    return response.json();
   });
 }

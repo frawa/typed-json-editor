@@ -2,6 +2,7 @@
   "name": "typed-json-editor",
   "scripts": {
     "dev": "vite",
+    "dev:debug": "vite --debug",
     "build": "tsc && vite build",
     "test": "vitest",
     "serve": "vite preview"
