@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Editor } from "./components/Editor";
-import { getValidation, putSchema } from "./typeJson/typedJson";
+import { updatedInstance, updatedSchema } from "./typeJson/typedJson";
 
 export function App(): React.ReactElement {
   const [value] = useState(toJsonString(initialValue));
@@ -17,13 +17,13 @@ export function App(): React.ReactElement {
       <div className="column">
         <h1>Json Editor</h1>
         <div className="monaco-container" id="editor">
-          <Editor value={value} onChange={getValidation} />
+          <Editor value={value} onChange={updatedInstance} />
         </div>
       </div>
       <div className="column">
         <h1>Schema Editor</h1>
         <div className="monaco-container" id="editorSchema">
-          <Editor value={schema} onChange={putSchema} />
+          <Editor value={schema} onChange={updatedSchema} />
         </div>
         <label htmlFor="sample-schema">Try one of these:</label>
         <select

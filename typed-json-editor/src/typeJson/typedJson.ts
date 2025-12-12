@@ -53,6 +53,30 @@ export function enableTypedJson(model: editor.ITextModel | null) {
   });
 }
 
+export const updatedInstance = debounced(updatedInstance_);
+export const updatedSchema = debounced(updatedSchema_);
+
+function debounced<S, T>(
+  f: (a: T) => Promise<S>,
+  delayMs = 513,
+): (a: T) => Promise<S> {
+  let cancelId: number | undefined;
+  return (a) => {
+    clearTimeout(cancelId);
+    return new Promise((resolve) => {
+      cancelId = setTimeout(() => f(a).then(resolve), delayMs);
+    });
+  };
+}
+
+function updatedInstance_(editor: editor.IStandaloneCodeEditor): Promise<void> {
+  return getValidation(editor.getValue());
+}
+
+function updatedSchema_(editor: editor.IStandaloneCodeEditor): Promise<void> {
+  return putSchema(editor.getValue());
+}
+
 async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
   const body = {
     instance: toInstance(instance),

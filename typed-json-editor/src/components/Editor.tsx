@@ -20,7 +20,7 @@ import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperation
 interface EditorProps {
   readonly value: string;
   readonly options?: editor.IEditorOptions;
-  readonly onChange?: (value: string) => void;
+  readonly onChange?: (editor: editor.IStandaloneCodeEditor) => void;
 }
 
 const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
@@ -69,10 +69,10 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
       });
 
       subscriptionRef.current = editor1.onDidChangeModelContent(() =>
-        onChangeRef.current?.(editor1.getValue()),
+        onChangeRef.current?.(editor1),
       );
 
-      // editor1.setMo;
+      // setModelMarkers(editor1,[]);
 
       editorRef.current = editor1;
     }
@@ -105,3 +105,6 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
 
   return <div className={styles.Editor} ref={containerRef}></div>;
 };
+function setModelMarkers(editor1: editor.IStandaloneCodeEditor, arg1: never[]) {
+  throw new Error("Function not implemented.");
+}
