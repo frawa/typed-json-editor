@@ -2,6 +2,7 @@ import { languages, editor, json } from "monaco-editor";
 import { Range } from "monaco-editor/esm/vs/editor/editor.api";
 import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
+import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -69,12 +70,29 @@ function debounced<S, T>(
   };
 }
 
-function updatedInstance_(editor: editor.IStandaloneCodeEditor): Promise<void> {
-  return getValidation(editor.getValue());
+function updatedInstance_(e: editor.IStandaloneCodeEditor): Promise<void> {
+  const model = e.getModel();
+  if (model) {
+    return getValidation(model.getValue())
+      .then(parseBasicOutput)
+      .then(async (o) => {
+        const doc = await parseJSONDocument(model);
+        return doc ? basicOutputToMarkers(o, model, doc) : [];
+      })
+      .then((markers) => {
+        editor.setModelMarkers(model, "instance validation", markers);
+      });
+  }
+  return Promise.resolve();
 }
 
 function updatedSchema_(editor: editor.IStandaloneCodeEditor): Promise<void> {
   return putSchema(editor.getValue());
+}
+
+async function parseJSONDocument(m: editor.ITextModel) {
+  const worker: json.IJSONWorker = await (await json.getWorker())();
+  return await worker.parseJSONDocument(m.uri.toString());
 }
 
 async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
@@ -106,7 +124,7 @@ export async function getValidation(instance: string) {
     },
     credentials: "include",
     // credentials: "same-origin",
-    body: JSON.stringify(instance),
+    body: instance,
   }).then((response) => {
     if (!response.ok) {
       console.log("ERROR fetching suggestions", response.status);

@@ -1,5 +1,5 @@
 import { editor, IDisposable } from "monaco-editor";
-//import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+// import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
@@ -72,8 +72,6 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
         onChangeRef.current?.(editor1),
       );
 
-      // setModelMarkers(editor1,[]);
-
       editorRef.current = editor1;
     }
   };
@@ -105,6 +103,3 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
 
   return <div className={styles.Editor} ref={containerRef}></div>;
 };
-function setModelMarkers(editor1: editor.IStandaloneCodeEditor, arg1: never[]) {
-  throw new Error("Function not implemented.");
-}

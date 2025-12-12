@@ -40,10 +40,12 @@ export function getPointerOffsets(
   pointer: string,
   doc: JSONDocument,
 ): Offsets | undefined {
-  if (!pointer.startsWith("/") || !doc.root) {
+  if (!doc.root) {
     return undefined;
-  } else if (pointer === "/") {
+  } else if (pointer === "" || pointer === "/") {
     return { offset: doc.root.offset, length: doc.root.length };
+  } else if (!pointer.startsWith("/")) {
+    return undefined;
   } else {
     const path = pointer.split("/").splice(1);
     return getPathOffsets(path, doc.root);
