@@ -72,8 +72,7 @@ function replaceAt(n: ASTNode, pos: SuggestPos): SuggestPos {
 }
 
 function appendPointer(segment: string | number, pos: SuggestPos): SuggestPos {
-  const pointer =
-    pos.pointer === "/" ? `/${segment}` : `${pos.pointer}/${segment}`;
+  const pointer = `${pos.pointer}/${segment}`;
   return { ...pos, pointer };
 }
 function insidePos(inside: boolean, pos: SuggestPos): SuggestPos {
@@ -122,7 +121,7 @@ export function getSuggestPosAt(
   };
   if (doc.root) {
     const pos: SuggestPos = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: doc.root.offset,
       replaceLength: doc.root.length,

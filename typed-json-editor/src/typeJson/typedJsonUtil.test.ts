@@ -24,7 +24,7 @@ describe("typedJson utils", () => {
     const value = "13";
     const doc = parse(value);
     const expected = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 2,
@@ -38,7 +38,7 @@ describe("typedJson utils", () => {
     const value = "[13,14]";
     const doc = parse(value);
     const expected0 = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 7,
@@ -74,7 +74,7 @@ describe("typedJson utils", () => {
     const value = "[13";
     const doc = parse(value);
     const expected0 = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 3,
@@ -95,7 +95,7 @@ describe("typedJson utils", () => {
     const value = "[13,,14";
     const doc = parse(value);
     const expected0 = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 7,
@@ -130,19 +130,19 @@ describe("typedJson utils", () => {
     const value = '{"foo":13}';
     const doc = parse(value);
     const expected0 = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 10,
     };
     const expected1 = {
-      pointer: "/",
+      pointer: "",
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: "/",
+      pointer: "",
       inside: true,
       replaceOffset: 1,
       replaceLength: 8,
@@ -170,13 +170,13 @@ describe("typedJson utils", () => {
     const value = "{ }";
     const doc = parse(value);
     const expected0 = {
-      pointer: "/",
+      pointer: "",
       inside: false,
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
-      pointer: "/",
+      pointer: "",
       inside: true,
       replaceOffset: 0,
       replaceLength: 3,
