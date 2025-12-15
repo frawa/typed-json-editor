@@ -60,7 +60,7 @@ const initialSchema = {
 
 const sampleSchemas = {
   properties: {
-    $schema_: "https://json-schema.org/draft/2020-12/schema",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
     properties: {
       foo: { type: "array", maxItems: 3 },
       bar: { type: "array" },
@@ -69,13 +69,13 @@ const sampleSchemas = {
     additionalProperties: { type: "integer" },
   },
   "if-then-else": {
-    $schema_: "https://json-schema.org/draft/2020-12/schema",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
     then: { const: "yes" },
     else: { const: "other" },
     if: { maxLength: 4 },
   },
   "all-of": {
-    $schema_: "https://json-schema.org/draft/2020-12/schema",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
     properties: { bar: { type: "integer" } },
     required: ["bar"],
     allOf: [
