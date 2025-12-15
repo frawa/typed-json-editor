@@ -43,6 +43,7 @@ export function App(): React.ReactElement {
           <option value="properties">Properties</option>
           <option value="if-then-else">If/Then/Else</option>
           <option value="all-of">All Of</option>
+          <option value="test-schema-6">not/not</option>
         </select>
       </div>
     </div>
@@ -59,7 +60,7 @@ const initialSchema = {
 
 const sampleSchemas = {
   properties: {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $schema_: "https://json-schema.org/draft/2020-12/schema",
     properties: {
       foo: { type: "array", maxItems: 3 },
       bar: { type: "array" },
@@ -68,13 +69,13 @@ const sampleSchemas = {
     additionalProperties: { type: "integer" },
   },
   "if-then-else": {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $schema_: "https://json-schema.org/draft/2020-12/schema",
     then: { const: "yes" },
     else: { const: "other" },
     if: { maxLength: 4 },
   },
   "all-of": {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $schema_: "https://json-schema.org/draft/2020-12/schema",
     properties: { bar: { type: "integer" } },
     required: ["bar"],
     allOf: [
@@ -91,6 +92,27 @@ const sampleSchemas = {
         required: ["baz"],
       },
     ],
+  },
+  "test-schema-6": {
+    properties: {
+      foo: {
+        not: {
+          not: {
+            const: 666,
+          },
+        },
+        oneOf: [
+          {
+            enum: [13, 42],
+          },
+        ],
+      },
+      bar: {
+        items: {
+          default: 1313,
+        },
+      },
+    },
   },
 };
 
