@@ -13,10 +13,7 @@ export function enableTypedJson(model: editor.ITextModel | null) {
       if (model !== m) {
         return null;
       }
-      const value = m.getValue();
-      const worker: json.IJSONWorker = await (await json.getWorker())();
-
-      const doc = await worker.parseJSONDocument(m.uri.toString());
+      const doc = await parseJSONDocument(m);
       const offset = m.getOffsetAt(position);
       // debugger;
       if (doc?.root) {
@@ -87,6 +84,7 @@ function updatedInstance_(e: editor.IStandaloneCodeEditor): Promise<void> {
 }
 
 function updatedSchema_(editor: editor.IStandaloneCodeEditor): Promise<void> {
+  // TODO dedicated endpoint to validate schema (against its meta schema)
   return putSchema(editor.getValue());
 }
 
@@ -98,15 +96,12 @@ async function parseJSONDocument(m: editor.ITextModel) {
 async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
   const body = {
     instance: toInstance(instance),
-    ...pos,
+    pointer: pos.pointer,
+    inside: pos.inside,
   };
   const response = await fetch("/api/suggest", {
     method: "POST",
-    headers: {
-      // "Content-Type": "application/json",
-    },
     credentials: "include",
-    // credentials: "same-origin",
     body: JSON.stringify(body),
   });
   if (!response.ok) {
@@ -118,12 +113,7 @@ async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
 export async function getValidation(instance: string) {
   return fetch("/api/validate?output=basic", {
     method: "POST",
-
-    headers: {
-      // "Content-Type": "application/json",
-    },
     credentials: "include",
-    // credentials: "same-origin",
     body: instance,
   }).then((response) => {
     if (!response.ok) {
@@ -136,12 +126,7 @@ export async function getValidation(instance: string) {
 export async function putSchema(schema: string) {
   return fetch("/api/schema", {
     method: "PUT",
-
-    headers: {
-      // "Content-Type": "application/json",
-    },
     credentials: "include",
-    // credentials: "same-origin",
     body: schema,
   }).then((response) => {
     if (!response.ok) {
