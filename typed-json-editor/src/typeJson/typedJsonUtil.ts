@@ -102,7 +102,7 @@ export function getSuggestPosAt(
             const [property] = found;
             return go(offset, property, pos);
           } else {
-            return replaceAt(n, pos);
+            return replaceAt(n, insidePos(isInside(offset, n), pos));
           }
         }
         case "property": {

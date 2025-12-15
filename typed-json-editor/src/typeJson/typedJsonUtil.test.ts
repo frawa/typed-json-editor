@@ -166,6 +166,27 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(10, doc)).toEqual(undefined);
   });
 
+  test("paths for samples", () => {
+    const value = "{ }";
+    const doc = parse(value);
+    const expected0 = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 3,
+    };
+    const expected1 = {
+      pointer: "/",
+      inside: true,
+      replaceOffset: 0,
+      replaceLength: 3,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(3, doc)).toEqual(undefined);
+  });
+
   test("offsets for broken pointer", () => {
     const value = "13";
     const doc = parse(value);
