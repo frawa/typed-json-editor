@@ -3,6 +3,7 @@ import { Range } from "monaco-editor/esm/vs/editor/editor.api";
 import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
 import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
+import { parseSuggestions, suggestionsToCompletionItems } from "./suggestions";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -15,37 +16,24 @@ export function enableTypedJson(model: editor.ITextModel | null) {
       }
       const doc = await parseJSONDocument(m);
       const offset = m.getOffsetAt(position);
-      // debugger;
+
       if (doc?.root) {
         const suggestPos = getSuggestPosAt(offset, doc);
         console.log("FW", offset, suggestPos);
-        const fw =
-          doc.root && suggestPos
-            ? await getSuggestions(doc.root, suggestPos)
-            : [];
-        console.log("FW", fw);
-      }
-
-      const result = null;
-      if (!result) {
-        const range = Range.fromPositions(position, position).toJSON();
-        const dummy: languages.CompletionItem = {
-          // label: 'dummy label',
-          label: {
-            label: "dummy label",
-            description: "dummy label description",
-            detail: "dummy label detail",
-          },
-          // kind: 0,
-          kind: languages.CompletionItemKind.Value,
-          detail: "dummy detail",
-          documentation: {
-            value: "dummy *documentation* \n ```still documentation``` \n",
-          },
-          insertText: "dummy insertText",
-          range,
-        };
-        return Promise.resolve({ suggestions: [dummy] });
+        if (suggestPos) {
+          const suggestions = await getSuggestions(doc.root, suggestPos);
+          const { replaceOffset, replaceLength } = suggestPos;
+          const from = m.getPositionAt(replaceOffset);
+          const to = m.getPositionAt(replaceOffset + replaceLength);
+          const range = Range.fromPositions(from, to);
+          const items = suggestionsToCompletionItems(
+            parseSuggestions(suggestions),
+            suggestPos,
+            range,
+          );
+          console.log("suggesting", items);
+          return Promise.resolve({ suggestions: items });
+        }
       }
     },
   });
