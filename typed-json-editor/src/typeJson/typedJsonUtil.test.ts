@@ -136,7 +136,7 @@ describe("typedJson utils", () => {
       replaceLength: 10,
     };
     const expected1 = {
-      pointer: "/foo",
+      pointer: "/",
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,

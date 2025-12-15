@@ -8,29 +8,6 @@ export interface SuggestPos {
   readonly replaceLength: number;
 }
 
-export function getSuggestPosAt(
-  offset: number,
-  doc: JSONDocument,
-): SuggestPos | undefined {
-  // original, used to define green tests
-  // const node = doc.getNodeFromOffset(offset)
-  const node = clientGetNodeFromOffset(offset, doc.root);
-  if (node) {
-    // original, used to define green tests
-    // const path = getNodePath(node);
-    const { path, inside } = getPathPos(node, offset);
-    const pointer = "/" + path.join("/");
-    return {
-      pointer,
-      inside,
-      replaceOffset: node.offset,
-      replaceLength: node.length,
-    };
-  } else {
-    return undefined;
-  }
-}
-
 export type Offsets = {
   readonly offset: number;
   readonly length: number;
@@ -83,75 +60,88 @@ export function toInstance(n: ASTNode): any {
   return {};
 }
 
-// need to re-implement doc.getNodeFromOffset,
-// 'cause the client-side objects are different from the worker-side.
+function contains(offset: number, n: ASTNode): boolean {
+  return n.offset <= offset && offset < n.offset + n.length;
+}
+function isInside(offset: number, n: ASTNode): boolean {
+  return n.offset < offset && offset < n.offset + n.length - 1;
+}
 
-function clientGetNodeFromOffset(
+function replaceAt(n: ASTNode, pos: SuggestPos): SuggestPos {
+  return { ...pos, replaceOffset: n.offset, replaceLength: n.length };
+}
+
+function appendPointer(segment: string | number, pos: SuggestPos): SuggestPos {
+  const pointer =
+    pos.pointer === "/" ? `/${segment}` : `${pos.pointer}/${segment}`;
+  return { ...pos, pointer };
+}
+function insidePos(inside: boolean, pos: SuggestPos): SuggestPos {
+  return { ...pos, inside };
+}
+
+export function getSuggestPosAt(
   offset: number,
-  n: ASTNode | undefined,
-): ASTNode | undefined {
-  if (n) {
-    if (n.offset <= offset && offset < n.offset + n.length) {
+  doc: JSONDocument,
+): SuggestPos | undefined {
+  const go = (offset: number, n: ASTNode, pos: SuggestPos) => {
+    if (contains(offset, n)) {
       switch (n.type) {
         case "array": {
-          return findNodeInChildren(offset, n.items) ?? n;
+          const found = findNodeInChildren(offset, n.items);
+          if (found) {
+            const [item, i] = found;
+            return go(offset, item, appendPointer(i, pos));
+          } else {
+            return replaceAt(n, insidePos(isInside(offset, n), pos));
+          }
         }
         case "object": {
-          return findNodeInChildren(offset, n.properties) ?? n;
+          const found = findNodeInChildren(offset, n.properties);
+          if (found) {
+            const [property] = found;
+            return go(offset, property, pos);
+          } else {
+            return replaceAt(n, pos);
+          }
         }
         case "property": {
-          const cs = n.valueNode ? [n.keyNode, n.valueNode] : [n.keyNode];
-          return findNodeInChildren(offset, cs) ?? n;
+          if (contains(offset, n.keyNode)) {
+            return replaceAt(n.keyNode, { ...pos, inside: true });
+          } else if (n.valueNode && contains(offset, n.valueNode)) {
+            return go(offset, n.valueNode, appendPointer(n.keyNode.value, pos));
+          }
+          return replaceAt(n, insidePos(isInside(offset, n), pos));
         }
         default: {
-          return n;
+          return replaceAt(n, pos);
         }
       }
     }
+    return undefined;
+  };
+  if (doc.root) {
+    const pos: SuggestPos = {
+      pointer: "/",
+      inside: false,
+      replaceOffset: doc.root.offset,
+      replaceLength: doc.root.length,
+    };
+    return go(offset, doc.root, pos);
   }
-  return undefined;
 }
 
 function findNodeInChildren(
   offset: number,
   cs: ASTNode[],
-): ASTNode | undefined {
+): [ASTNode, number] | undefined {
   for (let i = 0; i < cs.length && cs[i].offset <= offset; i++) {
-    const found = clientGetNodeFromOffset(offset, cs[i]);
+    const found = contains(offset, cs[i]);
     if (found) {
-      return found;
+      return [cs[i], i];
     }
   }
   return undefined;
-}
-
-type PathPos = { path: (string | number)[]; inside: boolean };
-
-function getPathPos(n: ASTNode, offset: number): PathPos {
-  const inside =
-    (n.type === "array" || n.type === "property") &&
-    n.offset < offset &&
-    offset < n.offset + n.length - 1;
-  const pos = { path: [], inside };
-  return n.parent ? prependPath(n.parent, n, pos) : pos;
-}
-
-function prependPath(parent: ASTNode, node: ASTNode, pos: PathPos): PathPos {
-  switch (parent.type) {
-    case "array": {
-      const i = parent.items.indexOf(node);
-      const pos1 = { ...pos, path: [i, ...pos.path] };
-      return parent.parent ? prependPath(parent.parent, parent, pos1) : pos1;
-    }
-    case "property": {
-      const inside = parent.keyNode === node || pos.inside;
-      const pos1 = { path: [parent.keyNode.value, ...pos.path], inside };
-      return parent.parent ? prependPath(parent.parent, parent, pos1) : pos1;
-    }
-    default: {
-      return parent.parent ? prependPath(parent.parent, parent, pos) : pos;
-    }
-  }
 }
 
 function getPathOffsets(
