@@ -1,23 +1,22 @@
 import {
-  editor,
   IRange,
-  languages,
-  MarkerSeverity,
+  languages
 } from "monaco-editor/esm/vs/editor/editor.api";
-import { getPointerOffsets, SuggestPos } from "./typedJsonUtil";
-import { JSONDocument } from "vscode-json-languageservice";
+import { SuggestPos } from "./typedJsonUtil";
 
-export function parseSuggestions(json: any): readonly any[] {
+export type SuggestionOutput = { location: string; values: readonly any[] };
+
+export function parseSuggestionOutput(json: any): readonly SuggestionOutput[] {
   // TODO decoding
-  return json as any[];
+  return json as SuggestionOutput[];
 }
 
 export function suggestionsToCompletionItems(
-  suggestions: readonly any[],
+  suggestions: readonly SuggestionOutput[],
   pos: SuggestPos,
   range: IRange,
 ): languages.CompletionItem[] {
-  const go = (v: any) => {
+  const go = (location: string) => (v: any) => {
     const pretty = JSON.stringify(v, null, 2);
     const compact = JSON.stringify(v, null, 0);
     const label =
@@ -30,7 +29,7 @@ export function suggestionsToCompletionItems(
         //description: TODO keyword,
         // detail: "TODO label detail",
       },
-      detail: "TODO schema keyword detail",
+      detail: `${location}`, //"TODO schema keyword detail",
       documentation: {
         value: `\n\`\`\`${pretty}\`\`\`\n`,
       },
@@ -39,5 +38,7 @@ export function suggestionsToCompletionItems(
     };
     return item;
   };
-  return suggestions.map(go);
+  return suggestions.flatMap(output => {
+    return output.values.map(go(output.location))
+  });
 }

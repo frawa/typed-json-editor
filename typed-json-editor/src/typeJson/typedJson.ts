@@ -3,7 +3,7 @@ import { Range } from "monaco-editor/esm/vs/editor/editor.api";
 import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
 import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
-import { parseSuggestions, suggestionsToCompletionItems } from "./suggestions";
+import {  parseSuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -26,10 +26,10 @@ export function enableTypedJson(model: editor.ITextModel | null) {
           const from = m.getPositionAt(replaceOffset);
           const to = m.getPositionAt(replaceOffset + replaceLength);
           const range = Range.fromPositions(from, to);
-          const suggestions = parseSuggestions(result)
-          if (suggestions) {
+          const output = parseSuggestionOutput(result)
+          if (output) {
             const items = suggestionsToCompletionItems(
-              suggestions,
+              output,
               suggestPos,
               range,
             );
