@@ -8,7 +8,8 @@ import { parseSuggestions, suggestionsToCompletionItems } from "./suggestions";
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
     // triggerCharacters: [' ,:{'],
-    triggerCharacters: [" "],
+    // triggerCharacters: [" "],
+    triggerCharacters: [], // default is ctrl-space
 
     provideCompletionItems: async (m, position, context) => {
       if (model !== m) {
@@ -19,20 +20,22 @@ export function enableTypedJson(model: editor.ITextModel | null) {
 
       if (doc?.root) {
         const suggestPos = getSuggestPosAt(offset, doc);
-        console.log("FW", offset, suggestPos);
         if (suggestPos) {
-          const suggestions = await getSuggestions(doc.root, suggestPos);
+          const result = await getSuggestions(doc.root, suggestPos);
           const { replaceOffset, replaceLength } = suggestPos;
           const from = m.getPositionAt(replaceOffset);
           const to = m.getPositionAt(replaceOffset + replaceLength);
           const range = Range.fromPositions(from, to);
-          const items = suggestionsToCompletionItems(
-            parseSuggestions(suggestions),
-            suggestPos,
-            range,
-          );
-          console.log("suggesting", items);
-          return Promise.resolve({ suggestions: items });
+          const suggestions = parseSuggestions(result)
+          if (suggestions) {
+            const items = suggestionsToCompletionItems(
+              suggestions,
+              suggestPos,
+              range,
+            );
+            console.log("suggesting", suggestPos, items);
+            return Promise.resolve({ suggestions: items });
+          }
         }
       }
     },
