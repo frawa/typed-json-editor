@@ -112,8 +112,14 @@ export function getSuggestPosAt(
           } else if (n.valueNode && contains(offset, n.valueNode)) {
             return go(offset, n.valueNode, appendPointer(n.keyNode.value, pos));
           } else {
-            const pos1 = insidePos(isInside(offset, n), pos);
-            return pos1.inside ? pos1 : replaceAt(n, pos1);
+            const inside =
+              n.colonOffset === undefined ||
+              n.colonOffset < 0 ||
+              offset <= n.colonOffset;
+            const pos1 = inside
+              ? replaceAt(n.keyNode, pos)
+              : appendPointer(n.keyNode.value, pos);
+            return insidePos(inside, pos1);
           }
         }
         default: {

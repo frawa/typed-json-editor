@@ -47,7 +47,7 @@ describe("typedJson utils", () => {
       ...expected0,
       inside: true,
       replaceOffset: 3,
-      replaceLength: 0
+      replaceLength: 0,
     };
     const expected1 = {
       pointer: "/0",
@@ -152,12 +152,6 @@ describe("typedJson utils", () => {
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: "",
-      inside: true,
-      replaceOffset: 6,
-      replaceLength: 0,
-    };
-    const expected3 = {
       pointer: "/foo",
       inside: false,
       replaceOffset: 7,
@@ -169,11 +163,74 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(3, doc)).toEqual(expected1);
     expect(getSuggestPosAt(4, doc)).toEqual(expected1);
     expect(getSuggestPosAt(5, doc)).toEqual(expected1);
-    expect(getSuggestPosAt(6, doc)).toEqual(expected2);
-    expect(getSuggestPosAt(7, doc)).toEqual(expected3);
-    expect(getSuggestPosAt(8, doc)).toEqual(expected3);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(7, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(8, doc)).toEqual(expected2);
     expect(getSuggestPosAt(9, doc)).toEqual(expected0);
     expect(getSuggestPosAt(10, doc)).toEqual(undefined);
+  });
+
+  test("paths for broken object property value", () => {
+    const value = '{"foo":}';
+    const doc = parse(value);
+    const expected0 = {
+      pointer: "",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 8,
+    };
+    const expected1 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 1,
+      replaceLength: 5,
+    };
+    const expected2 = {
+      pointer: "/foo",
+      inside: false,
+      replaceOffset: 7,
+      replaceLength: 0,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(4, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(5, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(7, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(8, doc)).toEqual(undefined);
+  });
+  test("paths for broken object only key", () => {
+    const value = '{"foo" }';
+    const doc = parse(value);
+    const expected0 = {
+      pointer: "",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 8,
+    };
+    const expected1 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 1,
+      replaceLength: 5,
+    };
+    const expected2 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 1,
+      replaceLength: 5,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(1, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(3, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(4, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(5, doc)).toEqual(expected1);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(7, doc)).toEqual(expected2);
+    expect(getSuggestPosAt(8, doc)).toEqual(undefined);
   });
 
   test("paths for samples", () => {
