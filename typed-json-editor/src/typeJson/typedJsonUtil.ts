@@ -92,7 +92,8 @@ export function getSuggestPosAt(
             const [item, i] = found;
             return go(offset, item, appendPointer(i, pos));
           } else {
-            return replaceAt(n, insidePos(isInside(offset, n), pos));
+            const pos1 = insidePos(isInside(offset, n), pos);
+            return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
         case "object": {
@@ -101,7 +102,8 @@ export function getSuggestPosAt(
             const [property] = found;
             return go(offset, property, pos);
           } else {
-            return replaceAt(n, insidePos(isInside(offset, n), pos));
+            const pos1 = insidePos(isInside(offset, n), pos);
+            return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
         case "property": {
@@ -109,8 +111,10 @@ export function getSuggestPosAt(
             return replaceAt(n.keyNode, { ...pos, inside: true });
           } else if (n.valueNode && contains(offset, n.valueNode)) {
             return go(offset, n.valueNode, appendPointer(n.keyNode.value, pos));
+          } else {
+            const pos1 = insidePos(isInside(offset, n), pos);
+            return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
-          return replaceAt(n, insidePos(isInside(offset, n), pos));
         }
         default: {
           return replaceAt(n, pos);
@@ -123,8 +127,8 @@ export function getSuggestPosAt(
     const pos: SuggestPos = {
       pointer: "",
       inside: false,
-      replaceOffset: doc.root.offset,
-      replaceLength: doc.root.length,
+      replaceOffset: offset,
+      replaceLength: 0,
     };
     return go(offset, doc.root, pos);
   }
