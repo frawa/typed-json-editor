@@ -64,7 +64,7 @@ function contains(offset: number, n: ASTNode): boolean {
   return n.offset <= offset && offset < n.offset + n.length;
 }
 function isInside(offset: number, n: ASTNode): boolean {
-  return n.offset < offset && offset < n.offset + n.length - 1;
+  return n.offset < offset && offset < n.offset + n.length - 0;
 }
 
 function replaceAt(n: ASTNode, pos: SuggestPos): SuggestPos {
@@ -138,6 +138,7 @@ export function getSuggestPosAt(
     };
     return go(offset, doc.root, pos);
   }
+  return { pointer: "", inside: false, replaceOffset: 0, replaceLength: 0 };
 }
 
 function findNodeInChildren(

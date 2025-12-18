@@ -20,7 +20,7 @@ describe("typedJson utils", () => {
     return doc;
   }
 
-  test("paths for number", () => {
+  test("suggest pos for number", () => {
     const value = "13";
     const doc = parse(value);
     const expected = {
@@ -34,7 +34,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(2, doc)).toEqual(undefined);
   });
 
-  test("paths for array", () => {
+  test("suggest pos for array", () => {
     const value = "[13,14]";
     const doc = parse(value);
     const expected0 = {
@@ -61,18 +61,23 @@ describe("typedJson utils", () => {
       replaceOffset: 4,
       replaceLength: 2,
     };
+    const expected3 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 6,
+      replaceLength: 0,
+    };
     expect(getSuggestPosAt(0, doc)).toEqual(expected0);
     expect(getSuggestPosAt(1, doc)).toEqual(expected1);
     expect(getSuggestPosAt(2, doc)).toEqual(expected1);
     expect(getSuggestPosAt(3, doc)).toEqual(expected0b); // TODO inside true
     expect(getSuggestPosAt(4, doc)).toEqual(expected2);
     expect(getSuggestPosAt(5, doc)).toEqual(expected2);
-    expect(getSuggestPosAt(6, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(6, doc)).toEqual(expected3);
     expect(getSuggestPosAt(7, doc)).toEqual(undefined);
-    expect(getSuggestPosAt(8, doc)).toEqual(undefined);
   });
 
-  test("paths for broken array", () => {
+  test("suggest pos for broken array", () => {
     const value = "[13";
     const doc = parse(value);
     const expected0 = {
@@ -93,7 +98,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(3, doc)).toEqual(undefined);
   });
 
-  test("paths for broken array with more elements", () => {
+  test("suggest pos for broken array with more elements", () => {
     const value = "[13,,14";
     const doc = parse(value);
     const expected0 = {
@@ -136,7 +141,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(7, doc)).toEqual(undefined);
   });
 
-  test("paths for object", () => {
+  test("suggest pos for object", () => {
     const value = '{"foo":13}';
     const doc = parse(value);
     const expected0 = {
@@ -157,6 +162,12 @@ describe("typedJson utils", () => {
       replaceOffset: 7,
       replaceLength: 2,
     };
+    const expected3 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 9,
+      replaceLength: 0,
+    };
     expect(getSuggestPosAt(0, doc)).toEqual(expected0);
     expect(getSuggestPosAt(1, doc)).toEqual(expected1);
     expect(getSuggestPosAt(2, doc)).toEqual(expected1);
@@ -166,11 +177,11 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(6, doc)).toEqual(expected1);
     expect(getSuggestPosAt(7, doc)).toEqual(expected2);
     expect(getSuggestPosAt(8, doc)).toEqual(expected2);
-    expect(getSuggestPosAt(9, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(9, doc)).toEqual(expected3);
     expect(getSuggestPosAt(10, doc)).toEqual(undefined);
   });
 
-  test("paths for broken object property value", () => {
+  test("suggest pos for broken object property value", () => {
     const value = '{"foo":}';
     const doc = parse(value);
     const expected0 = {
@@ -201,7 +212,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(7, doc)).toEqual(expected2);
     expect(getSuggestPosAt(8, doc)).toEqual(undefined);
   });
-  test("paths for broken object only key", () => {
+  test("suggest pos for broken object only key", () => {
     const value = '{"foo" }';
     const doc = parse(value);
     const expected0 = {
@@ -233,7 +244,7 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(8, doc)).toEqual(undefined);
   });
 
-  test("paths for samples", () => {
+  test("suggest pos for samples", () => {
     const value = "{ }";
     const doc = parse(value);
     const expected0 = {
@@ -248,10 +259,28 @@ describe("typedJson utils", () => {
       replaceOffset: 1,
       replaceLength: 0,
     };
+    const expected2 = {
+      pointer: "",
+      inside: true,
+      replaceOffset: 2,
+      replaceLength: 0,
+    };
     expect(getSuggestPosAt(0, doc)).toEqual(expected0);
     expect(getSuggestPosAt(1, doc)).toEqual(expected1);
-    expect(getSuggestPosAt(2, doc)).toEqual(expected0);
+    expect(getSuggestPosAt(2, doc)).toEqual(expected2);
     expect(getSuggestPosAt(3, doc)).toEqual(undefined);
+  });
+
+  test("suggest pos for empty", () => {
+    const value = "";
+    const doc = parse(value);
+    const expected = {
+      pointer: "",
+      inside: false,
+      replaceOffset: 0,
+      replaceLength: 0,
+    };
+    expect(getSuggestPosAt(0, doc)).toEqual(expected);
   });
 
   test("offsets for broken pointer", () => {
