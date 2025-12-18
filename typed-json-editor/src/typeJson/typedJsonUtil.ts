@@ -37,7 +37,7 @@ export function toInstance(n: ASTNode): any {
     case "object": {
       let o: { [key: string]: any } = {};
       n.properties.forEach((p) => {
-        o[p.keyNode.value] = p.valueNode?.value ?? null;
+        o[p.keyNode.value] = p.valueNode ? toInstance(p.valueNode) : null;
       });
       return o;
     }

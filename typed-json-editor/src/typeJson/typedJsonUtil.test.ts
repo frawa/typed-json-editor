@@ -9,7 +9,11 @@ import {
   JSONDocument,
   TextDocument,
 } from "vscode-json-languageservice";
-import { getPointerOffsets, getSuggestPosAt } from "./typedJsonUtil";
+import {
+  getPointerOffsets,
+  getSuggestPosAt,
+  toInstance,
+} from "./typedJsonUtil";
 
 describe("typedJson utils", () => {
   const jsonLanguageService = getLanguageService({});
@@ -320,5 +324,11 @@ describe("typedJson utils", () => {
     expect(getPointerOffsets("/", doc)).toEqual({ offset: 0, length: 8 });
     expect(getPointerOffsets("/foo", doc)).toEqual({ offset: 1, length: 5 });
     expect(getPointerOffsets("/bar", doc)).toEqual(undefined);
+  });
+
+  test("toInstance for empty sub object", () => {
+    const value = '{"foo":{}}';
+    const doc = parse(value);
+    expect(toInstance(doc.root!)).toEqual({ foo: {} });
   });
 });
