@@ -41,9 +41,11 @@ export function App(): React.ReactElement {
         >
           <option value=""></option>
           <option value="properties">Properties</option>
-          <option value="if-then-else">If/Then/Else</option>
+          <option value="if-then-else">Mini If/Then/Else</option>
           <option value="all-of">All Of</option>
+          <option value="test-schema-4">not</option>
           <option value="test-schema-6">not/not</option>
+          <option value="test-schema-7">if/then/else</option>
         </select>
       </div>
     </div>
@@ -93,6 +95,20 @@ const sampleSchemas = {
       },
     ],
   },
+  "test-schema-4": {
+    properties: {
+      foo: {
+        not: {
+          const: 666,
+        },
+        oneOf: [
+          {
+            enum: [13, 42],
+          },
+        ],
+      },
+    },
+  },
   "test-schema-6": {
     properties: {
       foo: {
@@ -110,6 +126,31 @@ const sampleSchemas = {
       bar: {
         items: {
           default: 1313,
+        },
+      },
+    },
+  },
+  "test-schema-7": {
+    if: {
+      type: "array",
+    },
+    then: {
+      contains: {
+        enum: [13, 42],
+      },
+    },
+    else: {
+      properties: {
+        foo: {
+          enum: ["foo1", "foo2"],
+        },
+
+        gnu: {
+          properties: {
+            bar: {
+              enum: ["gnu1", "gnu2"],
+            },
+          },
         },
       },
     },
