@@ -1,6 +1,12 @@
-h1 {
-    color: darkgray;
-    font-family: sans-serif;
+body {
+  background-color: darkolivegreen;
+  color: darkgray;
+  font-family: sans-serif;
+}
+
+select {
+    background-color: black  ;
+    color: lightgreen
 }
 
 .page {
