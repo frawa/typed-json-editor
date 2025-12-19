@@ -1,9 +1,12 @@
 import { languages, editor, json } from "monaco-editor";
-import { Range } from "monaco-editor/esm/vs/editor/editor.api";
+import { Range } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
 import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
-import {  parseSuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
+import {
+  parseSuggestionOutput,
+  suggestionsToCompletionItems,
+} from "./suggestions";
 
 export function enableTypedJson(model: editor.ITextModel | null) {
   return languages.registerCompletionItemProvider("json", {
@@ -26,7 +29,7 @@ export function enableTypedJson(model: editor.ITextModel | null) {
           const from = m.getPositionAt(replaceOffset);
           const to = m.getPositionAt(replaceOffset + replaceLength);
           const range = Range.fromPositions(from, to);
-          const output = parseSuggestionOutput(result)
+          const output = parseSuggestionOutput(result);
           if (output) {
             const items = suggestionsToCompletionItems(
               output,
@@ -90,7 +93,7 @@ async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
     pointer: pos.pointer,
     inside: pos.inside,
   };
-  const response = await fetch("/api/suggest", {
+  const response = await fetch("api/suggest", {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(body),
@@ -102,7 +105,7 @@ async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
 }
 
 export async function getValidation(instance: string) {
-  return fetch("/api/validate?output=basic", {
+  return fetch("api/validate?output=basic", {
     method: "POST",
     credentials: "include",
     body: instance,
@@ -115,7 +118,7 @@ export async function getValidation(instance: string) {
 }
 
 export async function putSchema(schema: string) {
-  return fetch("/api/schema", {
+  return fetch("api/schema", {
     method: "PUT",
     credentials: "include",
     body: schema,

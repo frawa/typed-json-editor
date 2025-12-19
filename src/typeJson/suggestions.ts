@@ -1,7 +1,7 @@
 import {
   IRange,
   languages
-} from "monaco-editor/esm/vs/editor/editor.api";
+} from "monaco-editor/esm/vs/editor/editor.api.js";
 import { SuggestPos } from "./typedJsonUtil";
 
 export type SuggestionOutput = { location: string; values: readonly any[] };

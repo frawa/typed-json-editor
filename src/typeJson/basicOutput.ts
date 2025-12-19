@@ -1,4 +1,4 @@
-import { editor, MarkerSeverity } from "monaco-editor/esm/vs/editor/editor.api";
+import { editor, MarkerSeverity } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { getPointerOffsets } from "./typedJsonUtil";
 import { JSONDocument } from "vscode-json-languageservice";
 

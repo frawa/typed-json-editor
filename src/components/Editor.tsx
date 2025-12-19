@@ -1,5 +1,5 @@
 import { editor, IDisposable } from "monaco-editor";
-import {} from "monaco-editor/esm/vs/editor/editor.api";
+//import {} from "monaco-editor/esm/vs/editor/editor.api";
 
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
