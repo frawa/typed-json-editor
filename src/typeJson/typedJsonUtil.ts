@@ -45,16 +45,20 @@ export function toInstance(n: ASTNode): any {
       throw new Error("boom");
     }
     case "string": {
-      return JSON.stringify(n.value);
+      //return JSON.stringify(n.value);
+      return n.value;
     }
     case "number": {
-      return JSON.stringify(n.value);
+      //return JSON.stringify(n.value);
+      return n.value;
     }
     case "boolean": {
-      return JSON.stringify(n.value);
+      //return JSON.stringify(n.value);
+      return n.value;
     }
     case "null": {
-      return JSON.stringify(null);
+      //return JSON.stringify(null);
+      return null;
     }
   }
   return {};
