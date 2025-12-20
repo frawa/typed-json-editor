@@ -4,7 +4,7 @@ import { editor, IDisposable } from "monaco-editor";
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
 import "./userWorker";
-import { enableTypedJson } from "../typeJson/typedJson";
+import { enableTypedJson, GetSuggestionsFun } from "../typeJson/typedJson";
 
 import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
 import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
@@ -19,13 +19,14 @@ import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperation
 
 interface EditorProps {
   readonly value: string;
+  readonly getSuggestions: GetSuggestionsFun;
+  readonly onChange: (editor: editor.IStandaloneCodeEditor) => void;
   readonly options?: editor.IStandaloneEditorConstructionOptions;
-  readonly onChange?: (editor: editor.IStandaloneCodeEditor) => void;
 }
 
 const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
-  // automaticLayout: true,
-  // automaticLayout: false,
+  automaticLayout: true,
+  // wordWrap: "on",
   // autoDetectHighContrast: false,
   minimap: {
     enabled: false,
@@ -34,21 +35,20 @@ const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
     enabled: true,
   },
   suggest: {
+    filterGraceful: false,
     preview: true,
-    previewMode: "subwordSmart",
+    previewMode: "prefix", //"subwordSmart",
+    matchOnWordStartOnly: false,
   },
   theme: "vs-dark",
   // theme: "vs",
-  // cursorWidth: 5,
-
-  // cursorBlinking: "solid",
   // theme: "vs",
   formatOnType: true,
   glyphMargin: false,
   lightbulb: {
     // enabled: ShowLightbulbIconMode.On,
   },
-  "semanticHighlighting.enabled": true,
+  // "semanticHighlighting.enabled": true,
 };
 
 export const Editor: FC<EditorProps> = (props: EditorProps) => {
@@ -61,7 +61,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
   // and https://github.com/vitejs/vite/discussions/1791
 
-  const { value, options } = props;
+  const { value, getSuggestions, options } = props;
 
   const initMonaco = () => {
     if (containerRef.current) {
@@ -99,7 +99,10 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
 
   useEffect(() => {
     if (editorRef.current) {
-      const typedJson = enableTypedJson(editorRef.current.getModel());
+      const typedJson = enableTypedJson(
+        editorRef.current.getModel(),
+        getSuggestions,
+      );
       return () => {
         typedJson.dispose();
       };

@@ -5,16 +5,25 @@ import { ASTNode } from "vscode-json-languageservice";
 import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
 import {
   parseSuggestionOutput,
+  SuggestionOutput,
   suggestionsToCompletionItems,
 } from "./suggestions";
 
-export function enableTypedJson(model: editor.ITextModel | null) {
+export type GetSuggestionsFun = (
+  n: ASTNode,
+  pos: SuggestPos,
+) => Promise<readonly SuggestionOutput[]>;
+
+export function enableTypedJson(
+  model: editor.ITextModel | null,
+  getSuggestions: GetSuggestionsFun,
+) {
   return languages.registerCompletionItemProvider("json", {
     // triggerCharacters: [' ,:{'],
     // triggerCharacters: [" "],
     triggerCharacters: [], // default is ctrl-space
 
-    provideCompletionItems: async (m, position, context) => {
+    provideCompletionItems: async (m, position) => {
       if (model !== m) {
         return null;
       }
@@ -24,13 +33,12 @@ export function enableTypedJson(model: editor.ITextModel | null) {
       if (doc?.root) {
         const suggestPos = getSuggestPosAt(offset, doc);
         if (suggestPos) {
-          const result = await getSuggestions(doc.root, suggestPos);
+          const output = await getSuggestions(doc.root, suggestPos);
           const { replaceOffset, replaceLength } = suggestPos;
           const from = m.getPositionAt(replaceOffset);
           const to = m.getPositionAt(replaceOffset + replaceLength);
           const range = Range.fromPositions(from, to);
-          const output = parseSuggestionOutput(result);
-          if (output) {
+          if (output.length > 0) {
             const items = suggestionsToCompletionItems(
               output,
               suggestPos,
@@ -61,25 +69,37 @@ function debounced<S, T>(
   };
 }
 
-function updatedInstance_(e: editor.IStandaloneCodeEditor): Promise<void> {
+async function updatedInstance_(
+  e: editor.IStandaloneCodeEditor,
+): Promise<void> {
   const model = e.getModel();
   if (model) {
-    return getValidation(model.getValue())
-      .then(parseBasicOutput)
-      .then(async (o) => {
-        const doc = await parseJSONDocument(model);
-        return doc ? basicOutputToMarkers(o, model, doc) : [];
-      })
-      .then((markers) => {
-        editor.setModelMarkers(model, "instance validation", markers);
-      });
+    const json = await getValidation(model.getValue());
+    const o =  parseBasicOutput(json);
+    const doc = await parseJSONDocument(model);
+    const markers = (doc ? basicOutputToMarkers(o, model, doc) : []);
+    editor.setModelMarkers(model, "instance validation", markers);
   }
   return Promise.resolve();
 }
 
-function updatedSchema_(editor: editor.IStandaloneCodeEditor): Promise<void> {
-  // TODO dedicated endpoint to validate schema (against its meta schema)
-  return putSchema(editor.getValue());
+async function updatedSchema_(e: editor.IStandaloneCodeEditor): Promise<void> {
+  const model = e.getModel();
+  if (model) {
+    await Promise.all([
+      putSchema(e.getValue()),
+      getSchemaValidation(model.getValue())
+        .then(parseBasicOutput)
+        .then(async (o) => {
+          const doc = await parseJSONDocument(model);
+          return doc ? basicOutputToMarkers(o, model, doc) : [];
+        })
+        .then((markers) => {
+          editor.setModelMarkers(model, "instance validation", markers);
+        }),
+    ]);
+  }
+  return Promise.resolve();
 }
 
 async function parseJSONDocument(m: editor.ITextModel) {
@@ -87,9 +107,12 @@ async function parseJSONDocument(m: editor.ITextModel) {
   return await worker.parseJSONDocument(m.uri.toString());
 }
 
-async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
+export async function getSuggestions(
+  node: ASTNode,
+  pos: SuggestPos,
+): Promise<readonly SuggestionOutput[]> {
   const body = {
-    instance: toInstance(instance),
+    instance: toInstance(node),
     pointer: pos.pointer,
     inside: pos.inside,
   };
@@ -99,7 +122,25 @@ async function getSuggestions(instance: ASTNode, pos: SuggestPos) {
     body: JSON.stringify(body),
   });
   if (!response.ok) {
-    console.log("ERROR fetching suggestions", response.status);
+    console.log("ERROR fetching instance suggestions", response.status);
+  }
+  const raw = await response.json();
+  return parseSuggestionOutput(raw);
+}
+
+export async function getSchemaSuggestions(instance: ASTNode, pos: SuggestPos) {
+  const body = {
+    instance: toInstance(instance),
+    pointer: pos.pointer,
+    inside: pos.inside,
+  };
+  const response = await fetch("api/suggestSchema", {
+    method: "POST",
+    // credentials: "include",
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    console.log("ERROR fetching schema suggestions", response.status);
   }
   return await response.json();
 }
@@ -111,7 +152,20 @@ export async function getValidation(instance: string) {
     body: instance,
   }).then((response) => {
     if (!response.ok) {
-      console.log("ERROR fetching suggestions", response.status);
+      console.log("ERROR validating instance", response.status);
+    }
+    return response.json();
+  });
+}
+
+export async function getSchemaValidation(instance: string) {
+  return fetch("api/validateSchema?output=basic", {
+    method: "POST",
+    // credentials: "include",
+    body: instance,
+  }).then((response) => {
+    if (!response.ok) {
+      console.log("ERROR validating schema", response.status);
     }
     return response.json();
   });
@@ -124,7 +178,7 @@ export async function putSchema(schema: string) {
     body: schema,
   }).then((response) => {
     if (!response.ok) {
-      console.log("ERROR fetching suggestions", response.status);
+      console.log("ERROR putting schema", response.status);
     }
     return response.json();
   });

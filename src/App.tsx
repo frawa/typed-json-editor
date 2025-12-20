@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Editor } from "./components/Editor";
-import { updatedInstance, updatedSchema } from "./typeJson/typedJson";
+import { getSchemaSuggestions, getSuggestions, updatedInstance, updatedSchema } from "./typeJson/typedJson";
 
 export function App(): React.ReactElement {
   const [value] = useState(toJsonString(initialValue));
@@ -19,6 +19,7 @@ export function App(): React.ReactElement {
         <div className="monaco-container" id="editor">
           <Editor
             value={value}
+            getSuggestions={getSuggestions}
             onChange={updatedInstance}
             options={{ theme: "vs-dark" }}
           />
@@ -29,6 +30,7 @@ export function App(): React.ReactElement {
         <div className="monaco-container" id="editorSchema">
           <Editor
             value={schema}
+            getSuggestions={getSchemaSuggestions}
             onChange={updatedSchema}
             options={{ theme: "vs" }}
           />
