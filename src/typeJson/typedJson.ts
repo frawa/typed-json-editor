@@ -2,7 +2,11 @@ import { languages, editor, json } from "monaco-editor";
 import { Range } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
-import { basicOutputToMarkers, parseBasicOutput } from "./basicOutput";
+import {
+  BasicOutput,
+  basicOutputToMarkers,
+  parseBasicOutput,
+} from "./basicOutput";
 import {
   parseSuggestionOutput,
   SuggestionOutput,
@@ -74,10 +78,9 @@ async function updatedInstance_(
 ): Promise<void> {
   const model = e.getModel();
   if (model) {
-    const json = await getValidation(model.getValue());
-    const o =  parseBasicOutput(json);
+    const o = await getValidation(model.getValue());
     const doc = await parseJSONDocument(model);
-    const markers = (doc ? basicOutputToMarkers(o, model, doc) : []);
+    const markers = doc ? basicOutputToMarkers(o, model, doc) : [];
     editor.setModelMarkers(model, "instance validation", markers);
   }
   return Promise.resolve();
@@ -87,9 +90,8 @@ async function updatedSchema_(e: editor.IStandaloneCodeEditor): Promise<void> {
   const model = e.getModel();
   if (model) {
     await Promise.all([
-      putSchema(e.getValue()),
+      putSchema(model.getValue()),
       getSchemaValidation(model.getValue())
-        .then(parseBasicOutput)
         .then(async (o) => {
           const doc = await parseJSONDocument(model);
           return doc ? basicOutputToMarkers(o, model, doc) : [];
@@ -128,9 +130,9 @@ export async function getSuggestions(
   return parseSuggestionOutput(raw);
 }
 
-export async function getSchemaSuggestions(instance: ASTNode, pos: SuggestPos) {
+export async function getSchemaSuggestions(node: ASTNode, pos: SuggestPos) {
   const body = {
-    instance: toInstance(instance),
+    instance: toInstance(node),
     pointer: pos.pointer,
     inside: pos.inside,
   };
@@ -142,10 +144,11 @@ export async function getSchemaSuggestions(instance: ASTNode, pos: SuggestPos) {
   if (!response.ok) {
     console.log("ERROR fetching schema suggestions", response.status);
   }
-  return await response.json();
+  const raw = await response.json();
+  return parseSuggestionOutput(raw);
 }
 
-export async function getValidation(instance: string) {
+export async function getValidation(instance: string): Promise<BasicOutput> {
   return fetch("api/validate?output=basic", {
     method: "POST",
     credentials: "include",
@@ -154,11 +157,14 @@ export async function getValidation(instance: string) {
     if (!response.ok) {
       console.log("ERROR validating instance", response.status);
     }
-    return response.json();
+    const raw = response.json();
+    return parseBasicOutput(raw);
   });
 }
 
-export async function getSchemaValidation(instance: string) {
+export async function getSchemaValidation(
+  instance: string,
+): Promise<BasicOutput> {
   return fetch("api/validateSchema?output=basic", {
     method: "POST",
     // credentials: "include",
@@ -167,7 +173,8 @@ export async function getSchemaValidation(instance: string) {
     if (!response.ok) {
       console.log("ERROR validating schema", response.status);
     }
-    return response.json();
+    const raw = response.json();
+    return parseBasicOutput(raw);
   });
 }
 
