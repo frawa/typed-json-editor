@@ -1,4 +1,7 @@
-import { editor, MarkerSeverity } from "monaco-editor/esm/vs/editor/editor.api.js";
+import {
+  editor,
+  MarkerSeverity,
+} from "monaco-editor/esm/vs/editor/editor.api.js";
 import { getPointerOffsets } from "./typedJsonUtil";
 import { JSONDocument } from "vscode-json-languageservice";
 
@@ -40,6 +43,7 @@ function basicErrorToMarker(
     if (offsets) {
       const from = model.getPositionAt(offsets.offset);
       const to = model.getPositionAt(offsets.offset + offsets.length);
+      const source = error.keywordLocation
       return {
         severity: MarkerSeverity.Error,
         startLineNumber: from.lineNumber,
@@ -47,6 +51,8 @@ function basicErrorToMarker(
         endLineNumber: to.lineNumber,
         endColumn: to.column,
         message: error.error,
+        source,
+        origin: 'typed-json',
       };
     }
     return undefined;
