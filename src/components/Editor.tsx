@@ -86,6 +86,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   useEffect(() => {
     if (editorRef.current && editorRef.current.getValue() !== value) {
       editorRef.current.setValue(value);
+      onChangeRef.current?.(editorRef.current)
     }
   }, [value]);
 
