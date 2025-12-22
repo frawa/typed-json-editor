@@ -1,17 +1,10 @@
-import { languages, editor, json } from "monaco-editor";
+import { editor, json, languages } from "monaco-editor";
 import { Range } from "monaco-editor/esm/vs/editor/editor.api.js";
-import { getSuggestPosAt, SuggestPos, toInstance } from "./typedJsonUtil";
 import { ASTNode } from "vscode-json-languageservice";
-import {
-  BasicOutput,
-  basicOutputToMarkers,
-  parseBasicOutput,
-} from "./basicOutput";
-import {
-  parseSuggestionOutput,
-  SuggestionOutput,
-  suggestionsToCompletionItems,
-} from "./suggestions";
+import { apiSchema, apiValidate, apiValidateSchema } from "./apiClient";
+import { basicOutputToMarkers } from "./basicOutput";
+import { SuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
+import { getSuggestPosAt, SuggestPos } from "./typedJsonUtil";
 
 export type GetSuggestionsFun = (
   n: ASTNode,
@@ -78,7 +71,7 @@ async function updatedInstance_(
 ): Promise<void> {
   const model = e.getModel();
   if (model) {
-    const o = await getValidation(model.getValue());
+    const o = await apiValidate(model.getValue());
     const doc = await parseJSONDocument(model);
     const markers = doc ? basicOutputToMarkers(o, model, doc) : [];
     editor.setModelMarkers(model, "instance validation", markers);
@@ -90,8 +83,8 @@ async function updatedSchema_(e: editor.IStandaloneCodeEditor): Promise<void> {
   const model = e.getModel();
   if (model) {
     await Promise.all([
-      putSchema(model.getValue()),
-      getSchemaValidation(model.getValue())
+      apiSchema(model.getValue()),
+      apiValidateSchema(model.getValue())
         .then(async (o) => {
           const doc = await parseJSONDocument(model);
           return doc ? basicOutputToMarkers(o, model, doc) : [];
@@ -107,86 +100,4 @@ async function updatedSchema_(e: editor.IStandaloneCodeEditor): Promise<void> {
 async function parseJSONDocument(m: editor.ITextModel) {
   const worker: json.IJSONWorker = await (await json.getWorker())();
   return await worker.parseJSONDocument(m.uri.toString());
-}
-
-export async function getSuggestions(
-  node: ASTNode,
-  pos: SuggestPos,
-): Promise<readonly SuggestionOutput[]> {
-  const body = {
-    instance: toInstance(node),
-    pointer: pos.pointer,
-    inside: pos.inside,
-  };
-  const response = await fetch("api/suggest", {
-    method: "POST",
-    credentials: "include",
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    console.log("ERROR fetching instance suggestions", response.status);
-  }
-  const raw = await response.json();
-  return parseSuggestionOutput(raw);
-}
-
-export async function getSchemaSuggestions(node: ASTNode, pos: SuggestPos) {
-  const body = {
-    instance: toInstance(node),
-    pointer: pos.pointer,
-    inside: pos.inside,
-  };
-  const response = await fetch("api/suggestSchema", {
-    method: "POST",
-    // credentials: "include",
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    console.log("ERROR fetching schema suggestions", response.status);
-  }
-  const raw = await response.json();
-  return parseSuggestionOutput(raw);
-}
-
-export async function getValidation(instance: string): Promise<BasicOutput> {
-  return fetch("api/validate?output=basic", {
-    method: "POST",
-    credentials: "include",
-    body: instance,
-  }).then((response) => {
-    if (!response.ok) {
-      console.log("ERROR validating instance", response.status);
-    }
-    const raw = response.json();
-    return parseBasicOutput(raw);
-  });
-}
-
-export async function getSchemaValidation(
-  instance: string,
-): Promise<BasicOutput> {
-  return fetch("api/validateSchema?output=basic", {
-    method: "POST",
-    // credentials: "include",
-    body: instance,
-  }).then((response) => {
-    if (!response.ok) {
-      console.log("ERROR validating schema", response.status);
-    }
-    const raw = response.json();
-    return parseBasicOutput(raw);
-  });
-}
-
-export async function putSchema(schema: string) {
-  return fetch("api/schema", {
-    method: "PUT",
-    credentials: "include",
-    body: schema,
-  }).then((response) => {
-    if (!response.ok) {
-      console.log("ERROR putting schema", response.status);
-    }
-    return response.json();
-  });
 }

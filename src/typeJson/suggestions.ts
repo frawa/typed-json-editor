@@ -1,7 +1,4 @@
-import {
-  IRange,
-  languages
-} from "monaco-editor/esm/vs/editor/editor.api.js";
+import { IRange, languages } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { SuggestPos } from "./typedJsonUtil";
 
 export type SuggestionOutput = { location: string; values: readonly any[] };
@@ -38,7 +35,7 @@ export function suggestionsToCompletionItems(
     };
     return item;
   };
-  return suggestions.flatMap(output => {
-    return output.values.map(go(output.location))
+  return suggestions.flatMap((output) => {
+    return output.values.map(go(output.location));
   });
 }

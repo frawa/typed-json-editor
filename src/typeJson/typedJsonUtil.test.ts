@@ -1,18 +1,13 @@
-import { describe, test, expect } from "vitest";
-
-// import { languages, editor, json } from "monaco-editor";
-// import * as monaco from "monaco-editor";
-
-// import { getNodePath, getNodeValue, JSONDocument } from 'monaco-editor/esm/external/vscode-json-languageservice/lib/esm/parser/jsonParser';
+import { describe, expect, test } from "vitest";
 import {
-  getLanguageService,
-  JSONDocument,
-  TextDocument,
+    getLanguageService,
+    JSONDocument,
+    TextDocument,
 } from "vscode-json-languageservice";
 import {
-  getPointerOffsets,
-  getSuggestPosAt,
-  toInstance,
+    getPointerOffsets,
+    getSuggestPosAt,
+    toInstance,
 } from "./typedJsonUtil";
 
 describe("typedJson utils", () => {
