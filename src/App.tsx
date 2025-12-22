@@ -23,7 +23,7 @@ export function App(): React.ReactElement {
             value={value}
             getSuggestions={apiSuggestion}
             onChange={updatedInstance}
-            options={{ theme: "vs-dark" }}
+            options={{ theme: "vs" }}
           />
         </div>
       </div>
@@ -45,6 +45,7 @@ export function App(): React.ReactElement {
         >
           <option value=""></option>
           <option value="properties">Properties</option>
+          <option value="discriminated-union">Discriminated Untion Type</option>
           <option value="if-then-else">Mini If/Then/Else</option>
           <option value="all-of">All Of</option>
           <option value="test-schema-4">not</option>
