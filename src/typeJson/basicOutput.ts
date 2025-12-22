@@ -6,7 +6,7 @@ import { JSONDocument } from "vscode-json-languageservice";
 import { getPointerOffsets } from "./typedJsonUtil";
 
 export type BasicOutput = {
-  readonly flag: boolean;
+  readonly valid: boolean;
   readonly errors?: readonly BasicError[];
 };
 

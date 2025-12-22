@@ -6,8 +6,9 @@ import { sampleSchemas } from "./typeJson/sampleSchemas";
 import { updatedInstance, updatedSchema } from "./typeJson/typedJson";
 
 export function App(): React.ReactElement {
-  const [value] = useState(toJsonString(initialValue));
+  const [value, setValue] = useState(toJsonString(initialValue));
   const [schema, setSchema] = useState(toJsonString(initialSchema));
+  const [schemaId, setSchemaId] = useState(0);
 
   const setSampleSchema = (id: string) => {
     const s = (sampleSchemas as any)[id] ?? initialSchema;
@@ -21,8 +22,12 @@ export function App(): React.ReactElement {
         <div className="monaco-container" id="editor">
           <Editor
             value={value}
+            schemaId={schemaId}
             getSuggestions={apiSuggestion}
-            onChange={updatedInstance}
+            onChange={(e) => {
+              setValue(e.getValue());
+              updatedInstance(e);
+            }}
             options={{ theme: "vs" }}
           />
         </div>
@@ -33,7 +38,14 @@ export function App(): React.ReactElement {
           <Editor
             value={schema}
             getSuggestions={apiSuggestSchema}
-            onChange={updatedSchema}
+            onChange={(e) => {
+              setSchema(e.getValue());
+              updatedSchema(e).then((valid) => {
+                if (valid) {
+                  setSchemaId(schemaId + 1);
+                }
+              });
+            }}
             options={{ theme: "vs" }}
           />
         </div>

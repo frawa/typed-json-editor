@@ -71,30 +71,30 @@ async function updatedInstance_(
 ): Promise<void> {
   const model = e.getModel();
   if (model) {
-    const o = await apiValidate(model.getValue());
+    const basicOutput = await apiValidate(model.getValue());
     const doc = await parseJSONDocument(model);
-    const markers = doc ? basicOutputToMarkers(o, model, doc) : [];
+    const markers = doc ? basicOutputToMarkers(basicOutput, model, doc) : [];
     editor.setModelMarkers(model, "instance validation", markers);
   }
   return Promise.resolve();
 }
 
-async function updatedSchema_(e: editor.IStandaloneCodeEditor): Promise<void> {
+async function updatedSchema_(
+  e: editor.IStandaloneCodeEditor,
+): Promise<boolean> {
   const model = e.getModel();
   if (model) {
-    await Promise.all([
-      apiSchema(model.getValue()),
-      apiValidateSchema(model.getValue())
-        .then(async (o) => {
-          const doc = await parseJSONDocument(model);
-          return doc ? basicOutputToMarkers(o, model, doc) : [];
-        })
-        .then((markers) => {
-          editor.setModelMarkers(model, "instance validation", markers);
-        }),
-    ]);
+    const value = model.getValue();
+    const basicOutput = await apiValidateSchema(value);
+    const doc = await parseJSONDocument(model);
+    const markers = doc ? basicOutputToMarkers(basicOutput, model, doc) : [];
+    editor.setModelMarkers(model, "schema validation", markers);
+    if (basicOutput.valid) {
+      await apiSchema(value);
+    }
+    return basicOutput.valid;
   }
-  return Promise.resolve();
+  return Promise.resolve(false);
 }
 
 async function parseJSONDocument(m: editor.ITextModel) {

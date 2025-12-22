@@ -21,6 +21,7 @@ interface EditorProps {
   readonly value: string;
   readonly getSuggestions: GetSuggestionsFun;
   readonly onChange: (editor: editor.IStandaloneCodeEditor) => void;
+  readonly schemaId?: number;
   readonly options?: editor.IStandaloneEditorConstructionOptions;
 }
 
@@ -61,7 +62,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
   // and https://github.com/vitejs/vite/discussions/1791
 
-  const { value, getSuggestions, options } = props;
+  const { value, schemaId, getSuggestions, options } = props;
 
   const initMonaco = () => {
     if (containerRef.current) {
@@ -86,9 +87,15 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   useEffect(() => {
     if (editorRef.current && editorRef.current.getValue() !== value) {
       editorRef.current.setValue(value);
-      onChangeRef.current?.(editorRef.current)
+      onChangeRef.current?.(editorRef.current);
     }
   }, [value]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      onChangeRef.current?.(editorRef.current);
+    }
+  }, [schemaId]);
 
   useEffect(
     () => () => {
