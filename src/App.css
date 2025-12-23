@@ -2,6 +2,7 @@ body {
   background-color: darkolivegreen;
   color: darkgray;
   font-family: sans-serif;
+  margin: 0;
 }
 
 select {
@@ -11,17 +12,34 @@ select {
 
 .page {
     display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+
+.header {
+    width: 80%;
+    align-self: center;
+}
+
+.footer {
+    width: 80%;
+    align-self: center;
+    margin: 13px
+}
+
+.content {
+    display: flex;
+    flex-grow: 1;
 }
 
 .column {
     width: 50%;
-    height: 100%;
 }
 
 .monaco-container {
-    /*width: 500px;*/
-    height: 400px;
+    height: 80%;
     border: 1px solid #ccc;
+    margin: 0
 }
 
 .monaco-container .monaco-editor .cursors-layer > .cursor {

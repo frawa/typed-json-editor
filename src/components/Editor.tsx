@@ -26,7 +26,7 @@ interface EditorProps {
 }
 
 const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
-  automaticLayout: true,
+  // automaticLayout: true,
   // wordWrap: "on",
   // autoDetectHighContrast: false,
   minimap: {
@@ -69,8 +69,8 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
       const model = editor.createModel(value, "json");
 
       const editor1 = editor.create(containerRef.current, {
-        ...options,
         ...defaultOptions,
+        ...options,
         model,
       });
 
