@@ -30,7 +30,7 @@ export function App(): React.ReactElement {
                 setValue(e.getValue());
                 updatedInstance(e);
               }}
-              options={{ theme: "vs" }}
+              options={{ theme: "vs-dark" }}
             />
           </div>
         </div>
@@ -48,7 +48,7 @@ export function App(): React.ReactElement {
                   }
                 });
               }}
-              options={{ theme: "vs" }}
+              options={{ theme: "vs-dark" }}
             />
           </div>
           <label htmlFor="sample-schema">Try one of these:</label>
