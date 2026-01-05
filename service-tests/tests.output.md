@@ -86,3 +86,31 @@ typed-json-service/wip> run tests.validateAll @schemaDetailed.json @instanceDeta
       ]
   ]
 ```
+
+``` ucm
+typed-json-service/wip> run tests.validateAll {} {:}
+
+  [ Json.Object
+      [ ( "message"
+        , Json.Text
+            "JSON document failed to parse: ParseError.ParseError\n  \"expected text literal\" 1 \":}\""
+        )
+      ]
+  , Json.Object
+      [ ( "message"
+        , Json.Text
+            "JSON document failed to parse: ParseError.ParseError\n  \"expected text literal\" 1 \":}\""
+        )
+      ]
+  ]
+```
+
+``` ucm
+typed-json-service/wip> run tests.validateAll {:} {}
+
+  [ Json.Object
+      [("message", Json.Text "no active session schema")]
+  , Json.Object
+      [("message", Json.Text "no active session schema")]
+  ]
+```
