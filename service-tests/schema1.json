@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": { "foo2": {} },
+  "dependentSchemas": {
+    "foo": {},
+    "foo2": {
+      "properties": {
+        "bar": {}
+      }
+    }
+  }
+}

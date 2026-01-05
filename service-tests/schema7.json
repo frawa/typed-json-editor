@@ -1,0 +1,24 @@
+{
+  "if": {
+    "type": "array"
+  },
+  "then": {
+    "contains": {
+      "enum": [13, 42]
+    }
+  },
+  "else": {
+    "properties": {
+      "foo": {
+        "enum": ["foo1", "foo2"]
+      },
+      "gnu": {
+        "properties": {
+          "bar": {
+            "enum": ["gnu1", "gnu2"]
+          }
+        }
+      }
+    }
+  }
+}
