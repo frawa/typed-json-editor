@@ -20,3 +20,9 @@ typed-json-service/wip> run tests.validateAll {} {:}
 ``` ucm
 typed-json-service/wip> run tests.validateAll {:} {}
 ```
+
+``` ucm
+typed-json-service/wip> run tests.suggestAll @schema7.json []
+typed-json-service/wip> run tests.suggestAll @schema7.json [13]
+typed-json-service/wip> run tests.suggestAll @schema7.json {"gnu":{"bar":42},"foo":13}
+```

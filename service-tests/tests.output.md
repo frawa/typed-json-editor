@@ -114,3 +114,151 @@ typed-json-service/wip> run tests.validateAll {:} {}
       [("message", Json.Text "no active session schema")]
   ]
 ```
+
+``` ucm
+typed-json-service/wip> run tests.suggestAll @schema7.json []
+
+  [ ( SuggestPos (Pointer.Pointer []) false
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/if/type")
+            , ("values", Json.Array [Json.Array []])
+            ]
+        ]
+    )
+  , (SuggestPos (Pointer.Pointer []) true, Json.Array [])
+  ]
+
+typed-json-service/wip> run tests.suggestAll @schema7.json [13]
+
+  [ ( SuggestPos (Pointer.Pointer []) false
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/if/type")
+            , ("values", Json.Array [Json.Array []])
+            ]
+        ]
+    )
+  , (SuggestPos (Pointer.Pointer []) true, Json.Array [])
+  , ( SuggestPos (Pointer.Pointer [Index 0]) false
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/then/contains/enum")
+            , ( "values"
+              , Json.Array [Json.Number "13", Json.Number "42"]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer [Index 0]) true
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/then/contains/enum")
+            , ( "values"
+              , Json.Array [Json.Number "13", Json.Number "42"]
+              )
+            ]
+        ]
+    )
+  ]
+
+typed-json-service/wip> run tests.suggestAll @schema7.json {"gnu":{"bar":42},"foo":13}
+
+  [ ( SuggestPos (Pointer.Pointer []) false
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/else/properties")
+            , ("values", Json.Array [Json.Object []])
+            ]
+        , Json.Object
+            [ ("location", Json.Text "/if/type")
+            , ("values", Json.Array [Json.Array []])
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer []) true
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/else/properties")
+            , ( "values"
+              , Json.Array [Json.Text "foo", Json.Text "gnu"]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer [Token.Name "gnu"]) false
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text "/else/properties/gnu/properties"
+              )
+            , ("values", Json.Array [Json.Object []])
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer [Token.Name "gnu"]) true
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text "/else/properties/gnu/properties"
+              )
+            , ("values", Json.Array [Json.Text "bar"])
+            ]
+        ]
+    )
+  , ( SuggestPos
+        (Pointer.Pointer [Token.Name "gnu", Token.Name "bar"])
+        false
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text
+                  "/else/properties/gnu/properties/bar/enum"
+              )
+            , ( "values"
+              , Json.Array [Json.Text "gnu1", Json.Text "gnu2"]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos
+        (Pointer.Pointer [Token.Name "gnu", Token.Name "bar"])
+        true
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text
+                  "/else/properties/gnu/properties/bar/enum"
+              )
+            , ( "values"
+              , Json.Array [Json.Text "gnu1", Json.Text "gnu2"]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer [Token.Name "foo"]) false
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text "/else/properties/foo/enum"
+              )
+            , ( "values"
+              , Json.Array [Json.Text "foo1", Json.Text "foo2"]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer [Token.Name "foo"]) true
+    , Json.Array
+        [ Json.Object
+            [ ( "location"
+              , Json.Text "/else/properties/foo/enum"
+              )
+            , ( "values"
+              , Json.Array [Json.Text "foo1", Json.Text "foo2"]
+              )
+            ]
+        ]
+    )
+  ]
+```
