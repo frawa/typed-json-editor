@@ -37,6 +37,18 @@ typed-json-service/wip> run tests.validateAll @schema1.json @instance1.json
             ]
         )
       ]
+  , Json.Object
+      [ ("valid", Json.Boolean true)
+      , ("keywordLocation", Json.Text "/(ignored \"$schema\")")
+      , ("instanceLocation", Json.Text "")
+      , ("annotation", Json.Text "(ignored \"$schema\")")
+      ]
+  , Json.Object
+      [ ("valid", Json.Boolean true)
+      , ("keywordLocation", Json.Text "/(ignored \"$schema\")")
+      , ("instanceLocation", Json.Text "")
+      , ("annotation", Json.Text "(ignored \"$schema\")")
+      ]
   ]
 ```
 
@@ -54,6 +66,45 @@ typed-json-service/wip> run tests.validateAll @schemaDetailed.json @instanceDeta
                   )
                 , ("instanceLocation", Json.Text "/fooo")
                 , ("error", Json.Text "expected type: integer")
+                ]
+            ]
+        )
+      ]
+  , Json.Object
+      [ ("valid", Json.Boolean false)
+      , ( "keywordLocation"
+        , Json.Text "/patternProperties/f.*o/type"
+        )
+      , ("instanceLocation", Json.Text "/fooo")
+      , ("error", Json.Text "expected type: integer")
+      ]
+  , Json.Object
+      [ ("valid", Json.Boolean false)
+      , ("keywordLocation", Json.Text "/patternProperties")
+      , ("instanceLocation", Json.Text "")
+      , ( "errors"
+        , Json.Array
+            [ Json.Object
+                [ ("valid", Json.Boolean true)
+                , ( "keywordLocation"
+                  , Json.Text "/patternProperties/f.*o/type"
+                  )
+                , ("instanceLocation", Json.Text "/foo")
+                ]
+            , Json.Object
+                [ ("valid", Json.Boolean false)
+                , ( "keywordLocation"
+                  , Json.Text "/patternProperties/f.*o/type"
+                  )
+                , ("instanceLocation", Json.Text "/fooo")
+                , ("error", Json.Text "expected type: integer")
+                ]
+            , Json.Object
+                [ ("valid", Json.Boolean true)
+                , ( "keywordLocation"
+                  , Json.Text "/patternProperties/f.*o/type"
+                  )
+                , ("instanceLocation", Json.Text "/foooo")
                 ]
             ]
         )
@@ -76,6 +127,18 @@ typed-json-service/wip> run tests.validateAll {} {:}
             "JSON document failed to parse: ParseError.ParseError\n  \"expected text literal\" 1 \":}\""
         )
       ]
+  , Json.Object
+      [ ( "message"
+        , Json.Text
+            "JSON document failed to parse: ParseError.ParseError\n  \"expected text literal\" 1 \":}\""
+        )
+      ]
+  , Json.Object
+      [ ( "message"
+        , Json.Text
+            "JSON document failed to parse: ParseError.ParseError\n  \"expected text literal\" 1 \":}\""
+        )
+      ]
   ]
 ```
 
@@ -83,6 +146,10 @@ typed-json-service/wip> run tests.validateAll {} {:}
 typed-json-service/wip> run tests.validateAll {:} {}
 
   [ Json.Object
+      [("message", Json.Text "no active session schema")]
+  , Json.Object
+      [("message", Json.Text "no active session schema")]
+  , Json.Object
       [("message", Json.Text "no active session schema")]
   , Json.Object
       [("message", Json.Text "no active session schema")]
