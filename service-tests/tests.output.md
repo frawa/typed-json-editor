@@ -55,32 +55,6 @@ typed-json-service/wip> run tests.validateAll @schemaDetailed.json @instanceDeta
                 , ("instanceLocation", Json.Text "/fooo")
                 , ("error", Json.Text "expected type: integer")
                 ]
-            , Json.Object
-                [ ( "keywordLocation"
-                  , Json.Text "/patternProperties/f.*o"
-                  )
-                , ("instanceLocation", Json.Text "/fooo")
-                , ("error", Json.Text "a sub schema failed")
-                ]
-            , Json.Object
-                [ ( "keywordLocation"
-                  , Json.Text "/patternProperties"
-                  )
-                , ("instanceLocation", Json.Text "")
-                , ("error", Json.Text "a sub schema failed")
-                ]
-            , Json.Object
-                [ ( "keywordLocation"
-                  , Json.Text "/patternProperties"
-                  )
-                , ("instanceLocation", Json.Text "")
-                , ("error", Json.Text "a sub schema failed")
-                ]
-            , Json.Object
-                [ ("keywordLocation", Json.Text "")
-                , ("instanceLocation", Json.Text "")
-                , ("error", Json.Text "a sub schema failed")
-                ]
             ]
         )
       ]
