@@ -4,7 +4,7 @@ import { editor, IDisposable } from "monaco-editor";
 import { FC, useEffect, useRef } from "react";
 import styles from "./Editor.module.css";
 import "./userWorker";
-import { enableTypedJson, GetSuggestionsFun } from "../typeJson/typedJson";
+import { enableTypedJson, SuggestFun } from "../typeJson/typedJson";
 
 import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
 import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
@@ -19,7 +19,7 @@ import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperation
 
 interface EditorProps {
   readonly value: string;
-  readonly getSuggestions: GetSuggestionsFun;
+  readonly suggest: SuggestFun;
   readonly onChange: (editor: editor.IStandaloneCodeEditor) => void;
   readonly schemaId?: number;
   readonly options?: editor.IStandaloneEditorConstructionOptions;
@@ -62,7 +62,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
   // and https://github.com/vitejs/vite/discussions/1791
 
-  const { value, schemaId, getSuggestions, options } = props;
+  const { value, schemaId, suggest, options } = props;
 
   const initMonaco = () => {
     if (containerRef.current) {
@@ -109,7 +109,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
     if (editorRef.current) {
       const typedJson = enableTypedJson(
         editorRef.current.getModel(),
-        getSuggestions,
+        suggest,
       );
       return () => {
         typedJson.dispose();

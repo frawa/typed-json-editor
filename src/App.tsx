@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Editor } from "./components/Editor";
-import { apiSuggestion, apiSuggestSchema } from "./typeJson/apiClient";
 import { sampleSchemas } from "./typeJson/sampleSchemas";
-import { updatedInstance, updatedSchema } from "./typeJson/typedJson";
+import { TypedJsonConnect, updatedInstance, updatedSchema } from "./typeJson/typedJson";
 
-export function App(): React.ReactElement {
+type AppProps = {
+  readonly connect: TypedJsonConnect;
+}
+
+export function App(props: AppProps): React.ReactElement {
+  const { connect } = props;
   const [value, setValue] = useState(toJsonString(initialValue));
   const [schema, setSchema] = useState(toJsonString(initialSchema));
   const [schemaId, setSchemaId] = useState(0);
@@ -25,10 +29,10 @@ export function App(): React.ReactElement {
             <Editor
               value={value}
               schemaId={schemaId}
-              getSuggestions={apiSuggestion}
+              suggest={connect.suggest}
               onChange={(e) => {
                 setValue(e.getValue());
-                updatedInstance(e);
+                updatedInstance({ validate: connect.validate, e });
               }}
               options={{ theme: "vs-dark" }}
             />
@@ -39,10 +43,10 @@ export function App(): React.ReactElement {
           <div className="monaco-container" id="editorSchema">
             <Editor
               value={schema}
-              getSuggestions={apiSuggestSchema}
+              suggest={connect.suggestSchema}
               onChange={(e) => {
                 setSchema(e.getValue());
-                updatedSchema(e).then((valid) => {
+                updatedSchema({ validateSchema: connect.validateSchema, updateSchema: connect.updateSchema, e }).then((valid) => {
                   if (valid) {
                     setSchemaId(schemaId + 1);
                   }
