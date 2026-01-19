@@ -7,6 +7,12 @@ export default defineConfig({
   base: '',
   plugins: [react()],
 
+  build: {
+    rollupOptions: {
+      external: ['./wasm/typedJsonLoader.js']
+    }
+  },
+
   server: {
     proxy: {
       "/api": {
