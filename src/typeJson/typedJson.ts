@@ -38,14 +38,22 @@ class TypedJsonConnectApi implements TypedJsonConnect {
   updateSchema: UpdateSchemaFun = apiSchema;
 }
 
+type LocalValidateFun = (arg: [string, string]) => string
+type LocalValidateSchemaFun = (arg: string) => string
+
 class TypedJsonConnectLocal implements TypedJsonConnect {
   suggest: SuggestFun = this.doSuggest;
   suggestSchema: SuggestFun = this.doSuggestSchema;
-  validate: ValidateFun = this.doValidate;
-  validateSchema: ValidateFun = this.doValidateSchema;
-  updateSchema: UpdateSchemaFun = this.doUpdateSchema;
+  validate: ValidateFun = v => this.doValidate(v);
+  validateSchema: ValidateFun = v => this.doValidateSchema(v);
+  updateSchema: UpdateSchemaFun = v => this.doUpdateSchema(v);
 
-  private schema: string = "";
+  private schema: string = "{}";
+  // @ts-ignore
+  private localValidate: LocalValidateFun = window['validate'] as LocalValidateFun;
+  // @ts-ignore
+  private localValidateSchema: LocalValidateSchemaFun = window['validateSchema'] as LocalValidateSchemaFun;
+
 
   private doSuggest(n: ASTNode, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
     return Promise.resolve([])
@@ -57,15 +65,38 @@ class TypedJsonConnectLocal implements TypedJsonConnect {
 
   private doValidate(instance: string): Promise<BasicOutput> {
     console.log("local validate", this.schema, instance);
-    return Promise.resolve({ valid: false })
+    try {
+      // workaround warp bug parsing newlines in json
+      // const instance2 = JSON.stringify(JSON.parse(instance));
+      const result = this.localValidate([this.schema, instance]);
+      // TODO real decoding
+      const o: BasicOutput = JSON.parse(result) as BasicOutput;
+      return Promise.resolve(o);
+    } catch (e) {
+      console.log("local validate failed", e);
+      return Promise.resolve({ valid: false })
+    }
   }
 
   private doValidateSchema(schema: string): Promise<BasicOutput> {
-    return Promise.resolve({ valid: false })
+    console.log("local validate schema", schema);
+    try {
+      // workaround warp bug parsing newlines in json
+      // const schema2 = JSON.stringify(JSON.parse(schema));
+      const result = this.localValidateSchema(schema);
+      console.log("local validate schema", schema, result);
+      // TODO real decoding
+      const o: BasicOutput = JSON.parse(result) as BasicOutput;
+      return Promise.resolve(o);
+    } catch (e) {
+      console.log("local validate schema failed", e);
+      return Promise.resolve({ valid: false })
+    }
   }
 
   private doUpdateSchema(schema: string): Promise<string> {
-    this.schema = schema
+    console.log("local update schema", schema);
+    this.schema = schema;
     return Promise.resolve("")
   }
 }

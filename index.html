@@ -1,25 +1,30 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>TypedJson Editor</title>
 
-        <script type="module">
-            let wasm = fetch("wasm/typedJson.wasm");
-            let { loadUnisonModule } = await import(
-                "./wasm/typedJsonLoader.js"
-            );
-            let { log, exports } = await loadUnisonModule(wasm);
-            window.hello = exports.hello;
-            window.validate = exports.validate;
-            window.suggest = exports.suggest;
-            window.validateSchema = exports.validateSchema;
-            window.echoJson = exports.echoJson;
-        </script>
-    </head>
-    <body>
-        <div id="root"></div>
-        <script type="module" src="/src/main.tsx"></script>
-    </body>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TypedJson Editor</title>
+
+    <script type="module">
+        let wasm = fetch("wasm/typedJson.wasm");
+        let { loadUnisonModule } = await import(
+            "./wasm/typedJsonLoader.js"
+        );
+        let { log, exports } = await loadUnisonModule(wasm);
+        window.validate = exports.validate;
+        window.suggest = exports.suggest;
+        window.validateSchema = exports.validateSchema;
+        window.suggestSchema = exports.suggestSchema;
+
+        window.hello = exports.hello;
+        window.echoJson = exports.echoJson;
+    </script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
