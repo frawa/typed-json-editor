@@ -76,7 +76,6 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
         // console.log("local validate schema", schema);
         try {
             const result = this.localValidateSchema(schema);
-            console.log("local validate schema", schema, result);
             const o: BasicOutput = parseBasicOutput(JSON.parse(result));
             return Promise.resolve(o);
         } catch (e) {
