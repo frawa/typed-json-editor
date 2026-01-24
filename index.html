@@ -5,18 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TypedJson Editor</title>
-
-    <script type="module">
-        let wasm = fetch("wasm/typedJson.wasm");
-        let { loadUnisonModule } = await import(
-            "./wasm/typedJsonLoader.js"
-        );
-        let { log, exports } = await loadUnisonModule(wasm);
-        window.validate = exports.validate;
-        window.suggest = exports.suggest;
-        window.validateSchema = exports.validateSchema;
-        window.suggestSchema = exports.suggestSchema;
-    </script>
 </head>
 
 <body>
