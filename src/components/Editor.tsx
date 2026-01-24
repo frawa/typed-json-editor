@@ -1,10 +1,10 @@
-import { editor, IDisposable } from "monaco-editor";
-//import {} from "monaco-editor/esm/vs/editor/editor.api";
 
 import { FC, useEffect, useRef } from "react";
+import { enableTypedJson, SuggestFun } from "../typeJson/typedJson";
 import styles from "./Editor.module.css";
 import "./userWorker";
-import { enableTypedJson, SuggestFun } from "../typeJson/typedJson";
+
+import { editor, IDisposable } from "monaco-editor/esm/vs/editor/editor.api.js";
 
 import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
 import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
@@ -16,6 +16,9 @@ import "monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js";
 import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
 import "monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js";
 import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js";
+
+import 'monaco-editor/esm/vs/language/json/monaco.contribution';
+// import 'monaco-editor/esm/vs/basic-languages/monaco.contribution';
 
 interface EditorProps {
   readonly value: string;

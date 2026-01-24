@@ -1,7 +1,6 @@
-import { ASTNode } from "vscode-json-languageservice";
 import { BasicOutput, parseBasicOutput } from "./basicOutput";
 import { SuggestionOutput, parseSuggestionOutput } from "./suggestions";
-import { SuggestPos, toInstance } from "./typedJsonUtil";
+import { SuggestPos } from "./typedJsonUtil";
 
 export async function apiSchema(schema: string): Promise<string> {
   return fetch("api/schema", {
@@ -22,11 +21,11 @@ export function parseSession(json: any): string {
 }
 
 export async function apiSuggestion(
-  node: ASTNode,
+  instance: string,
   pos: SuggestPos,
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
-    instance: toInstance(node),
+    instance: JSON.parse(instance),
     pointer: pos.pointer,
     inside: pos.inside,
   };
@@ -43,11 +42,11 @@ export async function apiSuggestion(
 }
 
 export async function apiSuggestSchema(
-  node: ASTNode,
+  instance: string,
   pos: SuggestPos,
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
-    instance: toInstance(node),
+    instance: JSON.parse(instance),
     pointer: pos.pointer,
     inside: pos.inside,
   };

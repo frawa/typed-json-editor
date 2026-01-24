@@ -1,27 +1,29 @@
 import { describe, expect, test } from "vitest";
+// import {
+//     getLanguageService,
+//     JSONDocument,
+//     TextDocument,
+// } from "vscode-json-languageservice";
+import { Node } from 'jsonc-parser';
 import {
-    getLanguageService,
-    JSONDocument,
-    TextDocument,
-} from "vscode-json-languageservice";
-import {
-    getPointerOffsets,
-    getSuggestPosAt,
-    toInstance,
+  getPointerOffsets,
+  getSuggestPosAt,
+  parseJson,
+  // toInstance,
 } from "./typedJsonUtil";
 
 describe("typedJson utils", () => {
-  const jsonLanguageService = getLanguageService({});
+  // const jsonLanguageService = getLanguageService({});
 
-  function parse(text: string): JSONDocument {
-    const td = TextDocument.create("", "json", 13, text);
-    const doc = jsonLanguageService.parseJSONDocument(td);
-    return doc;
+  function parse(text: string): Node {
+    // const td = TextDocument.create("", "json", 13, text);
+    // const doc = jsonLanguageService.parseJSONDocument(td);
+    return parseJson(text) ?? { type: 'null', offset: 0, length: 0 };
   }
 
   test("suggest pos for number", () => {
     const value = "13";
-    const doc = parse(value);
+    const doc = value;// parse(value);
     const expected = {
       pointer: "",
       inside: false,
@@ -35,7 +37,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for array", () => {
     const value = "[13,14]";
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -78,7 +80,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for broken array", () => {
     const value = "[13";
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -99,7 +101,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for broken array with more elements", () => {
     const value = "[13,,14";
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -142,7 +144,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for object", () => {
     const value = '{"foo":13}';
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -182,7 +184,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for broken object property value", () => {
     const value = '{"foo":}';
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -213,7 +215,7 @@ describe("typedJson utils", () => {
   });
   test("suggest pos for broken object only key", () => {
     const value = '{"foo" }';
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -245,7 +247,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for samples", () => {
     const value = "{ }";
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected0 = {
       pointer: "",
       inside: false,
@@ -272,7 +274,7 @@ describe("typedJson utils", () => {
 
   test("suggest pos for empty", () => {
     const value = "";
-    const doc = parse(value);
+    const doc = value; //parse(value);
     const expected = {
       pointer: "",
       inside: false,
@@ -321,9 +323,9 @@ describe("typedJson utils", () => {
     expect(getPointerOffsets("/bar", doc)).toEqual(undefined);
   });
 
-  test("toInstance for empty sub object", () => {
-    const value = '{"foo":{}}';
-    const doc = parse(value);
-    expect(toInstance(doc.root!)).toEqual({ foo: {} });
-  });
+  // test("toInstance for empty sub object", () => {
+  //   const value = '{"foo":{}}'
+  //   const doc = parse(value);
+  //   expect(toInstance(doc.root!)).toEqual({ foo: {} });
+  // });
 });

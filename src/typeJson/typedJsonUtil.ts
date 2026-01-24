@@ -1,5 +1,6 @@
-import { ASTNode, JSONDocument } from "vscode-json-languageservice";
+// import { ASTNode, JSONDocument } from "vscode-json-languageservice";
 // import { getNodePath } from "vscode-json-languagesefrvice/lib/esm/parser/jsonParser.js";
+import { Node, ParseError, parseTree } from 'jsonc-parser';
 
 export interface SuggestPos {
   readonly pointer: string;
@@ -15,63 +16,70 @@ export type Offsets = {
 
 export function getPointerOffsets(
   pointer: string,
-  doc: JSONDocument,
+  tree: Node,
 ): Offsets | undefined {
-  if (!doc.root) {
+  if (!tree) {
     return undefined;
   } else if (pointer === "" || pointer === "/") {
-    return { offset: doc.root.offset, length: doc.root.length };
+    return { offset: tree.offset, length: tree.length };
   } else if (!pointer.startsWith("/")) {
     return undefined;
   } else {
     const path = pointer.split("/").splice(1);
-    return getPathOffsets(path, doc.root);
+    return getPathOffsets(path, tree);
   }
 }
 
-export function toInstance(n: ASTNode): any {
-  switch (n.type) {
-    case "array": {
-      return n.items.map(toInstance);
-    }
-    case "object": {
-      let o: { [key: string]: any } = {};
-      n.properties.forEach((p) => {
-        o[p.keyNode.value] = p.valueNode ? toInstance(p.valueNode) : null;
-      });
-      return o;
-    }
-    case "property": {
-      throw new Error("boom");
-    }
-    case "string": {
-      //return JSON.stringify(n.value);
-      return n.value;
-    }
-    case "number": {
-      //return JSON.stringify(n.value);
-      return n.value;
-    }
-    case "boolean": {
-      //return JSON.stringify(n.value);
-      return n.value;
-    }
-    case "null": {
-      //return JSON.stringify(null);
-      return null;
-    }
-  }
-  return {};
+export function parseJson(t: string): Node | undefined {
+  const errors: ParseError[] = []
+  const result = parseTree(t, errors);
+  return errors.length === 0 ? result : undefined;
 }
 
-function contains(offset: number, n: ASTNode): boolean {
+// export function toInstance(n: ASTNode): any {
+//   switch (n.type) {
+//     case "array": {
+//       return n.items.map(toInstance);
+//     }
+//     case "object": {
+//       let o: { [key: string]: any } = {};
+//       n.properties.forEach((p) => {
+//         o[p.keyNode.value] = p.valueNode ? toInstance(p.valueNode) : null;
+//       });
+//       return o;
+//     }
+//     case "property": {
+//       throw new Error("boom");
+//     }
+//     case "string": {
+//       //return JSON.stringify(n.value);
+//       return n.value;
+//     }
+//     case "number": {
+//       //return JSON.stringify(n.value);
+//       return n.value;
+//     }
+//     case "boolean": {
+//       //return JSON.stringify(n.value);
+//       return n.value;
+//     }
+//     case "null": {
+//       //return JSON.stringify(null);
+//       return null;
+//     }
+//   }
+//   return {};
+// }
+
+function contains(offset: number, n: Node): boolean {
   return n.offset <= offset && offset < n.offset + n.length;
 }
-function isInside(offset: number, n: ASTNode): boolean {
+
+function isInside(offset: number, n: Node): boolean {
   return n.offset < offset && offset < n.offset + n.length - 0;
 }
 
-function replaceAt(n: ASTNode, pos: SuggestPos): SuggestPos {
+function replaceAt(n: Node, pos: SuggestPos): SuggestPos {
   return { ...pos, replaceOffset: n.offset, replaceLength: n.length };
 }
 
@@ -85,13 +93,13 @@ function insidePos(inside: boolean, pos: SuggestPos): SuggestPos {
 
 export function getSuggestPosAt(
   offset: number,
-  doc: JSONDocument,
+  tree: Node,
 ): SuggestPos | undefined {
-  const go = (offset: number, n: ASTNode, pos: SuggestPos) => {
+  const go = (offset: number, n: Node, pos: SuggestPos) => {
     if (contains(offset, n)) {
       switch (n.type) {
         case "array": {
-          const found = findNodeInChildren(offset, n.items);
+          const found = findNodeInChildren(offset, n.children ?? []);
           if (found) {
             const [item, i] = found;
             return go(offset, item, appendPointer(i, pos));
@@ -101,7 +109,7 @@ export function getSuggestPosAt(
           }
         }
         case "object": {
-          const found = findNodeInChildren(offset, n.properties);
+          const found = findNodeInChildren(offset, n.children ?? []);
           if (found) {
             const [property] = found;
             return go(offset, property, pos);
@@ -111,18 +119,19 @@ export function getSuggestPosAt(
           }
         }
         case "property": {
-          if (contains(offset, n.keyNode)) {
-            return replaceAt(n.keyNode, { ...pos, inside: true });
-          } else if (n.valueNode && contains(offset, n.valueNode)) {
-            return go(offset, n.valueNode, appendPointer(n.keyNode.value, pos));
+          const [keyNode, valueNode] = n.children ?? []
+          if (contains(offset, keyNode)) {
+            return replaceAt(keyNode, { ...pos, inside: true });
+          } else if (valueNode && contains(offset, valueNode)) {
+            return go(offset, valueNode, appendPointer(keyNode.value, pos));
           } else {
             const inside =
               n.colonOffset === undefined ||
               n.colonOffset < 0 ||
               offset <= n.colonOffset;
             const pos1 = inside
-              ? replaceAt(n.keyNode, pos)
-              : appendPointer(n.keyNode.value, pos);
+              ? replaceAt(keyNode, pos)
+              : appendPointer(keyNode.value, pos);
             return insidePos(inside, pos1);
           }
         }
@@ -133,22 +142,22 @@ export function getSuggestPosAt(
     }
     return undefined;
   };
-  if (doc.root) {
+  if (tree) {
     const pos: SuggestPos = {
       pointer: "",
       inside: false,
       replaceOffset: offset,
       replaceLength: 0,
     };
-    return go(offset, doc.root, pos);
+    return go(offset, tree, pos);
   }
   return { pointer: "", inside: false, replaceOffset: 0, replaceLength: 0 };
 }
 
 function findNodeInChildren(
   offset: number,
-  cs: ASTNode[],
-): [ASTNode, number] | undefined {
+  cs: Node[],
+): [Node, number] | undefined {
   for (let i = 0; i < cs.length && cs[i].offset <= offset; i++) {
     const found = contains(offset, cs[i]);
     if (found) {
@@ -160,7 +169,7 @@ function findNodeInChildren(
 
 function getPathOffsets(
   path: string[],
-  n: ASTNode | undefined,
+  n: Node | undefined,
 ): Offsets | undefined {
   if (n) {
     if (path.length === 0) {
@@ -170,11 +179,15 @@ function getPathOffsets(
     switch (n.type) {
       case "array": {
         const i = Number.parseInt(head);
-        return getPathOffsets(tail, n.items[i]);
+
+        const items = n.children as Node[] ?? []
+        return getPathOffsets(tail, items[i]);
       }
       case "object": {
-        const prop = n.properties.find((p) => p.keyNode.value === head);
-        const v = prop?.valueNode ?? prop?.keyNode;
+        const properties = (n.children?.map(p => p.children) ?? []) as [[Node, Node]]
+        const prop = properties.find(([k]) => k.value === head) ?? [];
+        const [keyNode, valueNode] = prop;
+        const v = valueNode ?? keyNode;
         return getPathOffsets(tail, v);
       }
     }

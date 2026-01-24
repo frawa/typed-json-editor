@@ -1,15 +1,20 @@
-import { editor, json, languages } from "monaco-editor";
-import { Range } from "monaco-editor/esm/vs/editor/editor.api.js";
-import { ASTNode } from "vscode-json-languageservice";
+// DONT import monaco-editor
+// import { json } from "monaco-editor";
+import 'monaco-editor/esm/vs/editor/editor.all.js';
+
+
+import { editor, languages, Range } from "monaco-editor/esm/vs/editor/editor.api.js";
+// import { getWorker } from 'monaco-editor/esm/vs/language/json/monaco.contribution.js';
+// import { ASTNode } from "vscode-json-languageservice";
 
 import { BasicOutput, basicOutputToMarkers } from "./basicOutput";
 import { SuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
 import { TypedJsonConnectApi } from "./TypedJsonConnectApi";
 import { TypedJsonConnectLocal } from "./TypedJsonConnectLocal";
-import { getSuggestPosAt, SuggestPos } from "./typedJsonUtil";
+import { getSuggestPosAt, parseJson, SuggestPos } from "./typedJsonUtil";
 
 export type SuggestFun = (
-  n: ASTNode,
+  instance: string,
   pos: SuggestPos,
 ) => Promise<readonly SuggestionOutput[]>;
 
@@ -45,13 +50,14 @@ export function enableTypedJson(
       if (model !== m) {
         return null;
       }
-      const doc = await parseJSONDocument(m);
+      const text = m.getValue();
+      const tree = parseJson(text);
       const offset = m.getOffsetAt(position);
 
-      if (doc?.root) {
-        const suggestPos = getSuggestPosAt(offset, doc);
+      if (tree) {
+        const suggestPos = getSuggestPosAt(offset, tree);
         if (suggestPos) {
-          const output = await suggest(doc.root, suggestPos);
+          const output = await suggest(text, suggestPos);
           const { replaceOffset, replaceLength } = suggestPos;
           const from = m.getPositionAt(replaceOffset);
           const to = m.getPositionAt(replaceOffset + replaceLength);
@@ -94,10 +100,13 @@ async function updatedInstance_(arg: {
 ): Promise<void> {
   const model = arg.e.getModel();
   if (model) {
-    const basicOutput = await arg.validate(model.getValue());
-    const doc = await parseJSONDocument(model);
-    const markers = doc ? basicOutputToMarkers(basicOutput, model, doc) : [];
-    editor.setModelMarkers(model, "instance validation", markers);
+    const value = model.getValue();
+    const tree = parseJson(value);
+    if (tree) {
+      const basicOutput = await arg.validate(value);
+      const markers = tree ? basicOutputToMarkers(basicOutput, model, tree) : [];
+      editor.setModelMarkers(model, "instance validation", markers);
+    }
   }
   return Promise.resolve();
 }
@@ -112,8 +121,8 @@ async function updatedSchema_(arg: {
   if (model) {
     const value = model.getValue();
     const basicOutput = await arg.validateSchema(value);
-    const doc = await parseJSONDocument(model);
-    const markers = doc ? basicOutputToMarkers(basicOutput, model, doc) : [];
+    const tree = await parseJson(value);
+    const markers = tree ? basicOutputToMarkers(basicOutput, model, tree) : [];
     editor.setModelMarkers(model, "schema validation", markers);
     if (basicOutput.valid) {
       await arg.updateSchema(value);
@@ -123,7 +132,3 @@ async function updatedSchema_(arg: {
   return Promise.resolve(false);
 }
 
-async function parseJSONDocument(m: editor.ITextModel) {
-  const worker: json.IJSONWorker = await (await json.getWorker())();
-  return await worker.parseJSONDocument(m.uri.toString());
-}

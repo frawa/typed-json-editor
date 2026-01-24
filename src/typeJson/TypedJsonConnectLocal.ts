@@ -1,8 +1,7 @@
-import { ASTNode } from "vscode-json-languageservice";
 import { BasicOutput, parseBasicOutput } from "./basicOutput";
 import { SuggestionOutput, parseSuggestionOutput } from "./suggestions";
 import { SuggestFun, TypedJsonConnect, UpdateSchemaFun, ValidateFun } from "./typedJson";
-import { SuggestPos, toInstance } from "./typedJsonUtil";
+import { SuggestPos } from "./typedJsonUtil";
 
 type LocalValidateFun = (arg: [string, string]) => string
 type LocalValidateSchemaFun = (arg: string) => string
@@ -28,9 +27,9 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
     private localSuggestSchema: LocalSuggestSchemaFun = window['suggestSchema'] as LocalSuggestSchemaFun;
 
 
-    private doSuggest(node: ASTNode, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
+    private doSuggest(instance: string, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
         const body = {
-            instance: toInstance(node),
+            instance: JSON.parse(instance),
             pointer: pos.pointer,
             inside: pos.inside,
         };
@@ -44,9 +43,9 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
         }
     }
 
-    private doSuggestSchema(node: ASTNode, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
+    private doSuggestSchema(instance: string, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
         const body = {
-            instance: toInstance(node),
+            instance: JSON.parse(instance),
             pointer: pos.pointer,
             inside: pos.inside,
         };
