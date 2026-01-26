@@ -8,14 +8,14 @@ import { editor, IDisposable } from "monaco-editor/esm/vs/editor/editor.api.js";
 
 import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
 import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
-import "monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js";
-import "monaco-editor/esm/vs/editor/contrib/find/browser/findController.js";
-import "monaco-editor/esm/vs/editor/contrib/hover/browser/getHover.js";
-import "monaco-editor/esm/vs/editor/contrib/linesOperations/browser/linesOperations.js";
-import "monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js";
-import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
-import "monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js";
-import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js";
+// import "monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js";
+// import "monaco-editor/esm/vs/editor/contrib/find/browser/findController.js";
+// import "monaco-editor/esm/vs/editor/contrib/hover/browser/getHover.js";  
+// import "monaco-editor/esm/vs/editor/contrib/linesOperations/browser/linesOperations.js";
+// import "monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js";
+// import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
+// import "monaco-editor/esm/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.js";
+// import "monaco-editor/esm/vs/editor/contrib/wordOperations/browser/wordOperations.js";
 
 import 'monaco-editor/esm/vs/language/json/monaco.contribution';
 // import 'monaco-editor/esm/vs/basic-languages/monaco.contribution';
@@ -43,9 +43,9 @@ const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
     preview: true,
     previewMode: "prefix", //"subwordSmart",
     matchOnWordStartOnly: false,
+    showWords: false,
   },
   theme: "vs-dark",
-  // theme: "vs",
   // theme: "vs",
   formatOnType: true,
   glyphMargin: false,
