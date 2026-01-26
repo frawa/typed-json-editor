@@ -121,4 +121,92 @@ export const sampleSchemas = {
       },
     },
   },
+  "polymorphism": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "http://schema.animal.Animal",
+    "type": "object",
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "what": {
+              "type": "string",
+              "const": "schema.animal.Lion"
+            }
+          }
+        },
+        "then": {
+          "$ref": "#/$defs/schema.animal.Lion"
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "what": {
+              "type": "string",
+              "const": "schema.animal.Elephant"
+            }
+          }
+        },
+        "then": {
+          "$ref": "#/$defs/schema.animal.Elephant"
+        }
+      }
+    ],
+    "$defs": {
+      "schema.animal.Animal": {
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sound": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "endangered": {
+            "type": "boolean"
+          }
+        }
+      },
+      "schema.animal.Lion": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/schema.animal.Animal"
+          }
+        ],
+        "properties": {
+          "mane": {
+            "type": "boolean"
+          }
+        }
+      },
+      "schema.animal.Elephant": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/schema.animal.Animal"
+          }
+        ],
+        "properties": {
+          "trunkLength": {
+            "type": "number",
+            "format": "double"
+          },
+          "tusk": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
 };
