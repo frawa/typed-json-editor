@@ -11,7 +11,7 @@ import { BasicOutput, basicOutputToMarkers } from "./basicOutput";
 import { SuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
 import { TypedJsonConnectApi } from "./TypedJsonConnectApi";
 import { TypedJsonConnectLocal } from "./TypedJsonConnectLocal";
-import { getSuggestPosAt, parseJson, SuggestPos } from "./typedJsonUtil";
+import { getSuggestPosAt, parseJson, parseTolerantJson, SuggestPos } from "./typedJsonUtil";
 
 export type SuggestFun = (
   instance: string,
@@ -51,7 +51,7 @@ export function enableTypedJson(
         return null;
       }
       const text = m.getValue();
-      const tree = parseJson(text);
+      const tree = parseTolerantJson(text);
       const offset = m.getOffsetAt(position);
 
       if (tree) {

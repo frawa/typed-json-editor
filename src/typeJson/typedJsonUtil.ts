@@ -35,41 +35,45 @@ export function parseJson(t: string): Node | undefined {
   const result = parseTree(t, errors);
   return errors.length === 0 ? result : undefined;
 }
+export function parseTolerantJson(t: string): Node | undefined {
+  return parseTree(t);
+}
 
-// export function toInstance(n: ASTNode): any {
-//   switch (n.type) {
-//     case "array": {
-//       return n.items.map(toInstance);
-//     }
-//     case "object": {
-//       let o: { [key: string]: any } = {};
-//       n.properties.forEach((p) => {
-//         o[p.keyNode.value] = p.valueNode ? toInstance(p.valueNode) : null;
-//       });
-//       return o;
-//     }
-//     case "property": {
-//       throw new Error("boom");
-//     }
-//     case "string": {
-//       //return JSON.stringify(n.value);
-//       return n.value;
-//     }
-//     case "number": {
-//       //return JSON.stringify(n.value);
-//       return n.value;
-//     }
-//     case "boolean": {
-//       //return JSON.stringify(n.value);
-//       return n.value;
-//     }
-//     case "null": {
-//       //return JSON.stringify(null);
-//       return null;
-//     }
-//   }
-//   return {};
-// }
+export function parseRepairedInstance(t: string): any {
+  const tree = parseTolerantJson(t)
+  return tree ? toRepairedInstance(tree) : {}
+}
+
+function toRepairedInstance(n: Node): any {
+  switch (n.type) {
+    case "array": {
+      return n.children?.map(toRepairedInstance);
+    }
+    case "object": {
+      let o: { [key: string]: any } = {};
+      n.children?.forEach((p) => {
+        const [keyNode, valueNode] = p.children ?? []
+        o[keyNode.value] = valueNode ? toRepairedInstance(valueNode) : null;
+      });
+      return o;
+    }
+    case "string": {
+      return n.value;
+    }
+    case "number": {
+      return n.value;
+    }
+    case "boolean": {
+      return n.value;
+    }
+    case "null": {
+      return null;
+    }
+    case "property": {
+      throw new Error("boom");
+    }
+  }
+}
 
 function contains(offset: number, n: Node): boolean {
   return n.offset <= offset && offset < n.offset + n.length;
