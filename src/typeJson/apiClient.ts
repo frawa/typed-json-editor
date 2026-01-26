@@ -1,6 +1,6 @@
 import { BasicOutput, parseBasicOutput } from "./basicOutput";
-import { SuggestionOutput, parseSuggestionOutput } from "./suggestions";
-import { SuggestPos } from "./typedJsonUtil";
+import { parseSuggestionOutput, SuggestionOutput } from "./suggestions";
+import { parseRepairedInstance, SuggestPos } from "./typedJsonUtil";
 
 export async function apiSchema(schema: string): Promise<string> {
   return fetch("api/schema", {
@@ -25,7 +25,7 @@ export async function apiSuggestion(
   pos: SuggestPos,
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
-    instance: JSON.parse(instance),
+    instance: parseRepairedInstance(instance),
     pointer: pos.pointer,
     inside: pos.inside,
   };
@@ -46,7 +46,7 @@ export async function apiSuggestSchema(
   pos: SuggestPos,
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
-    instance: JSON.parse(instance),
+    instance: parseRepairedInstance(instance),
     pointer: pos.pointer,
     inside: pos.inside,
   };
@@ -91,3 +91,7 @@ export async function apiValidateSchema(
     return parseBasicOutput(raw);
   });
 }
+function toRepairedInstane(instance: string) {
+  throw new Error("Function not implemented.");
+}
+

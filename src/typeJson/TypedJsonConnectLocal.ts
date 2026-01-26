@@ -1,7 +1,7 @@
 import { BasicOutput, parseBasicOutput } from "./basicOutput";
-import { SuggestionOutput, parseSuggestionOutput } from "./suggestions";
+import { parseSuggestionOutput, SuggestionOutput } from "./suggestions";
 import { SuggestFun, TypedJsonConnect, UpdateSchemaFun, ValidateFun } from "./typedJson";
-import { SuggestPos } from "./typedJsonUtil";
+import { parseRepairedInstance, SuggestPos } from "./typedJsonUtil";
 
 type LocalValidateFun = (arg: [string, string]) => string
 type LocalValidateSchemaFun = (arg: string) => string
@@ -29,7 +29,7 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
 
     private doSuggest(instance: string, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
         const body = {
-            instance: JSON.parse(instance),
+            instance: parseRepairedInstance(instance),
             pointer: pos.pointer,
             inside: pos.inside,
         };
@@ -45,7 +45,7 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
 
     private doSuggestSchema(instance: string, pos: SuggestPos): Promise<readonly SuggestionOutput[]> {
         const body = {
-            instance: JSON.parse(instance),
+            instance: parseRepairedInstance(instance),
             pointer: pos.pointer,
             inside: pos.inside,
         };
