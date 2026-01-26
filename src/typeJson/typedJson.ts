@@ -120,14 +120,16 @@ async function updatedSchema_(arg: {
   const model = arg.e.getModel();
   if (model) {
     const value = model.getValue();
-    const basicOutput = await arg.validateSchema(value);
     const tree = await parseJson(value);
-    const markers = tree ? basicOutputToMarkers(basicOutput, model, tree) : [];
-    editor.setModelMarkers(model, "schema validation", markers);
-    if (basicOutput.valid) {
-      await arg.updateSchema(value);
+    if (tree) {
+      const basicOutput = await arg.validateSchema(value);
+      const markers = basicOutputToMarkers(basicOutput, model, tree);
+      editor.setModelMarkers(model, "schema validation", markers);
+      if (basicOutput.valid) {
+        await arg.updateSchema(value);
+      }
+      return basicOutput.valid;
     }
-    return basicOutput.valid;
   }
   return Promise.resolve(false);
 }
