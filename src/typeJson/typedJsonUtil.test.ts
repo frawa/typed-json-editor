@@ -9,6 +9,7 @@ import {
   getPointerOffsets,
   getSuggestPosAt,
   parseJson,
+  parseRepairedInstance,
   // toInstance,
 } from "./typedJsonUtil";
 
@@ -309,9 +310,75 @@ describe("typedJson utils", () => {
     expect(getPointerOffsets("/bar", tree)).toEqual(undefined);
   });
 
-  // test("toInstance for empty sub object", () => {
-  //   const value = '{"foo":{}}'
-  //   const tree = parse(value);
-  //   expect(toInstance(doc.root!)).toEqual({ foo: {} });
-  // });
+  test("repair for empty", () => {
+    const value = ''
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({});
+  });
+
+  test("repair for empty object", () => {
+    const value = '{}'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({});
+  });
+
+  test("repair for empty array", () => {
+    const value = '[]'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual([]);
+  });
+
+  test("repair for broken property key", () => {
+    const value = '{"foo}'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({ "foo}": null });
+  });
+
+  test("repair for missing property value", () => {
+    const value = '{"foo":}'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({ "foo": null });
+  });
+
+  test("repair for broken property value", () => {
+    const value = '{"foo": 13b}'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({ "foo": 13 });
+  });
+
+  test("repair for next property key", () => {
+    const value = '{"foo": 13, }'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({ "foo": 13 });
+  });
+
+  test("repair for broken next property key", () => {
+    const value = '{"foo": 13, "}'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual({ "foo": 13, "}": null });
+  });
+
+  test("repair for broken array item", () => {
+    const value = '[13b]'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual([13]);
+  });
+
+  test("repair for incomplete array item", () => {
+    const value = '[13, "foo]'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual([13, "foo]"]);
+  });
+
+  test("repair for missing last array item", () => {
+    const value = '[13, true, ]'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual([13, true]);
+  });
+
+  test("repair for missing array item", () => {
+    const value = '[13,,true]'
+    const repaired = parseRepairedInstance(value);
+    expect(repaired).toEqual([13, true]);
+  });
 });
