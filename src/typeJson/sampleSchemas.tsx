@@ -121,7 +121,7 @@ export const sampleSchemas = {
       },
     },
   },
-  "polymorphism": {
+  "test-schema-8": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "http://schema.animal.Animal",
     "type": "object",
@@ -207,6 +207,29 @@ export const sampleSchemas = {
           }
         }
       }
+    }
+  },
+  "array-items": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "prefixItems": [
+      {
+        "enum": [
+          13,
+          14
+        ]
+      },
+      {
+        "enum": [
+          "foo",
+          "bar"
+        ]
+      }
+    ],
+    "items": {
+      "enum": [
+        42,
+        43
+      ]
     }
   }
 };

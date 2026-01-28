@@ -71,6 +71,7 @@ export function App(props: AppProps): React.ReactElement {
             <option value="test-schema-4">not</option>
             <option value="test-schema-6">not/not</option>
             <option value="test-schema-7">if/then/else</option>
+            <option value="test-schema-8">Array Items</option>
             <option value="polymorphism">Polymorphism</option>
           </select>
         </div>
