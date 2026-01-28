@@ -121,7 +121,7 @@ export const sampleSchemas = {
       },
     },
   },
-  "test-schema-8": {
+  "polymorphism": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "http://schema.animal.Animal",
     "type": "object",
@@ -209,7 +209,7 @@ export const sampleSchemas = {
       }
     }
   },
-  "array-items": {
+  "test-schema-8": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "prefixItems": [
       {
