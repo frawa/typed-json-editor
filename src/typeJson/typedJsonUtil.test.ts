@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from 'vitest';
 // import {
 //     getLanguageService,
 //     JSONDocument,
@@ -8,23 +8,20 @@ import { Node, parseTree } from 'jsonc-parser';
 import {
   getPointerOffsets,
   getSuggestPosAt,
-  parseJson,
   parseRepairedInstance,
-  // toInstance,
-} from "./typedJsonUtil";
+} from './typedJsonUtil';
 
-describe("typedJson utils", () => {
-
+describe('typedJson utils', () => {
   function parse(text: string): Node {
     const result = parseTree(text);
     return result ?? { type: 'null', offset: 0, length: 0 };
   }
 
-  test("suggest pos for number", () => {
-    const value = "13";
+  test('suggest pos for number', () => {
+    const value = '13';
     const tree = parse(value);
     const expected = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 2,
@@ -34,11 +31,11 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(2, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for array", () => {
-    const value = "[13,14]";
+  test('suggest pos for array', () => {
+    const value = '[13,14]';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 7,
@@ -50,19 +47,19 @@ describe("typedJson utils", () => {
       replaceLength: 0,
     };
     const expected1 = {
-      pointer: "/0",
+      pointer: '/0',
       inside: false,
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
-      pointer: "/1",
+      pointer: '/1',
       inside: false,
       replaceOffset: 4,
       replaceLength: 2,
     };
     const expected3 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 6,
       replaceLength: 0,
@@ -77,17 +74,17 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(7, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for broken array", () => {
-    const value = "[13";
+  test('suggest pos for broken array', () => {
+    const value = '[13';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
-      pointer: "/0",
+      pointer: '/0',
       inside: false,
       replaceOffset: 1,
       replaceLength: 2,
@@ -98,11 +95,11 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(3, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for broken array with more elements", () => {
-    const value = "[13,,14";
+  test('suggest pos for broken array with more elements', () => {
+    const value = '[13,,14';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 7,
@@ -120,13 +117,13 @@ describe("typedJson utils", () => {
       replaceLength: 0,
     };
     const expected1 = {
-      pointer: "/0",
+      pointer: '/0',
       inside: false,
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
-      pointer: "/1",
+      pointer: '/1',
       inside: false,
       replaceOffset: 5,
       replaceLength: 2,
@@ -141,29 +138,29 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(7, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for object", () => {
+  test('suggest pos for object', () => {
     const value = '{"foo":13}';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 10,
     };
     const expected1 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: "/foo",
+      pointer: '/foo',
       inside: false,
       replaceOffset: 7,
       replaceLength: 2,
     };
     const expected3 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 9,
       replaceLength: 0,
@@ -181,23 +178,23 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(10, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for broken object property value", () => {
+  test('suggest pos for broken object property value', () => {
     const value = '{"foo":}';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: "/foo",
+      pointer: '/foo',
       inside: false,
       replaceOffset: 7,
       replaceLength: 0,
@@ -212,23 +209,23 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(7, tree)).toEqual(expected2);
     expect(getSuggestPosAt(8, tree)).toEqual(undefined);
   });
-  test("suggest pos for broken object only key", () => {
+  test('suggest pos for broken object only key', () => {
     const value = '{"foo" }';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 1,
       replaceLength: 5,
@@ -244,23 +241,23 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(8, tree)).toEqual(undefined);
   });
 
-  test("suggest pos for samples", () => {
-    const value = "{ }";
+  test('suggest pos for samples', () => {
+    const value = '{ }';
     const tree = parse(value);
     const expected0 = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 1,
       replaceLength: 0,
     };
     const expected2 = {
-      pointer: "",
+      pointer: '',
       inside: true,
       replaceOffset: 2,
       replaceLength: 0,
@@ -271,113 +268,113 @@ describe("typedJson utils", () => {
     expect(getSuggestPosAt(3, tree)).toEqual(undefined);
   });
 
-  test("offsets for broken pointer", () => {
-    const value = "13";
+  test('offsets for broken pointer', () => {
+    const value = '13';
     const tree = parse(value);
-    expect(getPointerOffsets("broken", tree)).toEqual(undefined);
+    expect(getPointerOffsets('broken', tree)).toEqual(undefined);
   });
 
-  test("offsets for pointer", () => {
-    const value = "13";
+  test('offsets for pointer', () => {
+    const value = '13';
     const tree = parse(value);
-    expect(getPointerOffsets("", tree)).toEqual({ offset: 0, length: 2 });
-    expect(getPointerOffsets("/", tree)).toEqual({ offset: 0, length: 2 });
+    expect(getPointerOffsets('', tree)).toEqual({ offset: 0, length: 2 });
+    expect(getPointerOffsets('/', tree)).toEqual({ offset: 0, length: 2 });
   });
-  test("offsets for array", () => {
-    const value = "[13,14]";
+  test('offsets for array', () => {
+    const value = '[13,14]';
     const tree = parse(value);
-    expect(getPointerOffsets("", tree)).toEqual({ offset: 0, length: 7 });
-    expect(getPointerOffsets("/", tree)).toEqual({ offset: 0, length: 7 });
-    expect(getPointerOffsets("/0", tree)).toEqual({ offset: 1, length: 2 });
-    expect(getPointerOffsets("/1", tree)).toEqual({ offset: 4, length: 2 });
-    expect(getPointerOffsets("/13", tree)).toEqual(undefined);
+    expect(getPointerOffsets('', tree)).toEqual({ offset: 0, length: 7 });
+    expect(getPointerOffsets('/', tree)).toEqual({ offset: 0, length: 7 });
+    expect(getPointerOffsets('/0', tree)).toEqual({ offset: 1, length: 2 });
+    expect(getPointerOffsets('/1', tree)).toEqual({ offset: 4, length: 2 });
+    expect(getPointerOffsets('/13', tree)).toEqual(undefined);
   });
-  test("offsets for object", () => {
+  test('offsets for object', () => {
     const value = '{"foo":13}';
     const tree = parse(value);
-    expect(getPointerOffsets("", tree)).toEqual({ offset: 0, length: 10 });
-    expect(getPointerOffsets("/", tree)).toEqual({ offset: 0, length: 10 });
-    expect(getPointerOffsets("/foo", tree)).toEqual({ offset: 7, length: 2 });
-    expect(getPointerOffsets("/1", tree)).toEqual(undefined);
-    expect(getPointerOffsets("/bar", tree)).toEqual(undefined);
+    expect(getPointerOffsets('', tree)).toEqual({ offset: 0, length: 10 });
+    expect(getPointerOffsets('/', tree)).toEqual({ offset: 0, length: 10 });
+    expect(getPointerOffsets('/foo', tree)).toEqual({ offset: 7, length: 2 });
+    expect(getPointerOffsets('/1', tree)).toEqual(undefined);
+    expect(getPointerOffsets('/bar', tree)).toEqual(undefined);
   });
-  test("offsets for broken object", () => {
+  test('offsets for broken object', () => {
     const value = '{"foo":}';
     const tree = parse(value);
-    expect(getPointerOffsets("", tree)).toEqual({ offset: 0, length: 8 });
-    expect(getPointerOffsets("/", tree)).toEqual({ offset: 0, length: 8 });
-    expect(getPointerOffsets("/foo", tree)).toEqual({ offset: 1, length: 5 });
-    expect(getPointerOffsets("/bar", tree)).toEqual(undefined);
+    expect(getPointerOffsets('', tree)).toEqual({ offset: 0, length: 8 });
+    expect(getPointerOffsets('/', tree)).toEqual({ offset: 0, length: 8 });
+    expect(getPointerOffsets('/foo', tree)).toEqual({ offset: 1, length: 5 });
+    expect(getPointerOffsets('/bar', tree)).toEqual(undefined);
   });
 
-  test("repair for empty", () => {
-    const value = ''
+  test('repair for empty', () => {
+    const value = '';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual({});
   });
 
-  test("repair for empty object", () => {
-    const value = '{}'
+  test('repair for empty object', () => {
+    const value = '{}';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual({});
   });
 
-  test("repair for empty array", () => {
-    const value = '[]'
+  test('repair for empty array', () => {
+    const value = '[]';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual([]);
   });
 
-  test("repair for broken property key", () => {
-    const value = '{"foo}'
+  test('repair for broken property key', () => {
+    const value = '{"foo}';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual({ "foo}": null });
+    expect(repaired).toEqual({ 'foo}': null });
   });
 
-  test("repair for missing property value", () => {
-    const value = '{"foo":}'
+  test('repair for missing property value', () => {
+    const value = '{"foo":}';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual({ "foo": null });
+    expect(repaired).toEqual({ foo: null });
   });
 
-  test("repair for broken property value", () => {
-    const value = '{"foo": 13b}'
+  test('repair for broken property value', () => {
+    const value = '{"foo": 13b}';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual({ "foo": 13 });
+    expect(repaired).toEqual({ foo: 13 });
   });
 
-  test("repair for next property key", () => {
-    const value = '{"foo": 13, }'
+  test('repair for next property key', () => {
+    const value = '{"foo": 13, }';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual({ "foo": 13 });
+    expect(repaired).toEqual({ foo: 13 });
   });
 
-  test("repair for broken next property key", () => {
-    const value = '{"foo": 13, "}'
+  test('repair for broken next property key', () => {
+    const value = '{"foo": 13, "}';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual({ "foo": 13, "}": null });
+    expect(repaired).toEqual({ foo: 13, '}': null });
   });
 
-  test("repair for broken array item", () => {
-    const value = '[13b]'
+  test('repair for broken array item', () => {
+    const value = '[13b]';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual([13]);
   });
 
-  test("repair for incomplete array item", () => {
-    const value = '[13, "foo]'
+  test('repair for incomplete array item', () => {
+    const value = '[13, "foo]';
     const repaired = parseRepairedInstance(value);
-    expect(repaired).toEqual([13, "foo]"]);
+    expect(repaired).toEqual([13, 'foo]']);
   });
 
-  test("repair for missing last array item", () => {
-    const value = '[13, true, ]'
+  test('repair for missing last array item', () => {
+    const value = '[13, true, ]';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual([13, true]);
   });
 
-  test("repair for missing array item", () => {
-    const value = '[13,,true]'
+  test('repair for missing array item', () => {
+    const value = '[13,,true]';
     const repaired = parseRepairedInstance(value);
     expect(repaired).toEqual([13, true]);
   });

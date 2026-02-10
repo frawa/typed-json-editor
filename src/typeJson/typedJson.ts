@@ -2,29 +2,33 @@
 // import { json } from "monaco-editor";
 import 'monaco-editor/esm/vs/editor/editor.all.js';
 
-
-import { editor, languages, Range } from "monaco-editor/esm/vs/editor/editor.api.js";
+import {
+  editor,
+  languages,
+  Range,
+} from 'monaco-editor/esm/vs/editor/editor.api.js';
 // import { getWorker } from 'monaco-editor/esm/vs/language/json/monaco.contribution.js';
 // import { ASTNode } from "vscode-json-languageservice";
 
-import { BasicOutput, basicOutputToMarkers } from "./basicOutput";
-import { SuggestionOutput, suggestionsToCompletionItems } from "./suggestions";
-import { TypedJsonConnectApi } from "./TypedJsonConnectApi";
-import { TypedJsonConnectLocal } from "./TypedJsonConnectLocal";
-import { getSuggestPosAt, parseJson, parseTolerantJson, SuggestPos } from "./typedJsonUtil";
+import { BasicOutput, basicOutputToMarkers } from './basicOutput';
+import { SuggestionOutput, suggestionsToCompletionItems } from './suggestions';
+import { TypedJsonConnectApi } from './TypedJsonConnectApi';
+import { TypedJsonConnectLocal } from './TypedJsonConnectLocal';
+import {
+  getSuggestPosAt,
+  parseJson,
+  parseTolerantJson,
+  SuggestPos,
+} from './typedJsonUtil';
 
 export type SuggestFun = (
   instance: string,
-  pos: SuggestPos,
+  pos: SuggestPos
 ) => Promise<readonly SuggestionOutput[]>;
 
-export type ValidateFun = (
-  instance: string,
-) => Promise<BasicOutput>;
+export type ValidateFun = (instance: string) => Promise<BasicOutput>;
 
-export type UpdateSchemaFun = (
-  schema: string,
-) => Promise<string>;
+export type UpdateSchemaFun = (schema: string) => Promise<string>;
 
 export interface TypedJsonConnect {
   readonly suggest: SuggestFun;
@@ -34,14 +38,18 @@ export interface TypedJsonConnect {
   readonly updateSchema: UpdateSchemaFun;
 }
 
-export function apiConnect(): TypedJsonConnect { return new TypedJsonConnectApi(); }
-export function localConnect(): TypedJsonConnect { return new TypedJsonConnectLocal(); }
+export function apiConnect(): TypedJsonConnect {
+  return new TypedJsonConnectApi();
+}
+export function localConnect(): TypedJsonConnect {
+  return new TypedJsonConnectLocal();
+}
 
 export function enableTypedJson(
   model: editor.ITextModel | null,
-  suggest: SuggestFun,
+  suggest: SuggestFun
 ) {
-  return languages.registerCompletionItemProvider("json", {
+  return languages.registerCompletionItemProvider('json', {
     // triggerCharacters: [' ,:{'],
     // triggerCharacters: [" "],
     triggerCharacters: [], // default is ctrl-space
@@ -66,7 +74,7 @@ export function enableTypedJson(
             const items = suggestionsToCompletionItems(
               output,
               suggestPos,
-              range,
+              range
             );
             // console.log("suggesting", suggestPos, items);
             return Promise.resolve({ suggestions: items });
@@ -82,7 +90,7 @@ export const updatedSchema = debounced(updatedSchema_);
 
 function debounced<S, T>(
   f: (a: T) => Promise<S>,
-  delayMs = 513,
+  delayMs = 513
 ): (a: T) => Promise<S> {
   let cancelId: number | undefined;
   return (a) => {
@@ -94,29 +102,29 @@ function debounced<S, T>(
 }
 
 async function updatedInstance_(arg: {
-  validate: ValidateFun,
-  e: editor.IStandaloneCodeEditor,
-}
-): Promise<void> {
+  validate: ValidateFun;
+  e: editor.IStandaloneCodeEditor;
+}): Promise<void> {
   const model = arg.e.getModel();
   if (model) {
     const value = model.getValue();
     const tree = parseJson(value);
     if (tree) {
       const basicOutput = await arg.validate(value);
-      const markers = tree ? basicOutputToMarkers(basicOutput, model, tree) : [];
-      editor.setModelMarkers(model, "instance validation", markers);
+      const markers = tree
+        ? basicOutputToMarkers(basicOutput, model, tree)
+        : [];
+      editor.setModelMarkers(model, 'instance validation', markers);
     }
   }
   return Promise.resolve();
 }
 
 async function updatedSchema_(arg: {
-  validateSchema: ValidateFun,
-  updateSchema: UpdateSchemaFun,
-  e: editor.IStandaloneCodeEditor,
-}
-): Promise<boolean> {
+  validateSchema: ValidateFun;
+  updateSchema: UpdateSchemaFun;
+  e: editor.IStandaloneCodeEditor;
+}): Promise<boolean> {
   const model = arg.e.getModel();
   if (model) {
     const value = model.getValue();
@@ -124,7 +132,7 @@ async function updatedSchema_(arg: {
     if (tree) {
       const basicOutput = await arg.validateSchema(value);
       const markers = basicOutputToMarkers(basicOutput, model, tree);
-      editor.setModelMarkers(model, "schema validation", markers);
+      editor.setModelMarkers(model, 'schema validation', markers);
       if (basicOutput.valid) {
         await arg.updateSchema(value);
       }
@@ -133,4 +141,3 @@ async function updatedSchema_(arg: {
   }
   return Promise.resolve(false);
 }
-

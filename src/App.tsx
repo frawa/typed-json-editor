@@ -1,10 +1,14 @@
-import React, { useState } from "react";
-import "./App.css";
-import { Editor } from "./components/Editor";
-import { sampleSchemas } from "./typeJson/sampleSchemas";
-import { TypedJsonConnect, updatedInstance, updatedSchema } from "./typeJson/typedJson";
+import React, { useState } from 'react';
+import './App.css';
+import { Editor } from './components/Editor';
+import { sampleSchemas } from './typeJson/sampleSchemas';
+import {
+  TypedJsonConnect,
+  updatedInstance,
+  updatedSchema,
+} from './typeJson/typedJson';
 
-type AppProps = {
+interface AppProps {
   readonly connect: TypedJsonConnect;
 }
 
@@ -15,6 +19,7 @@ export function App(props: AppProps): React.ReactElement {
   const [schemaId, setSchemaId] = useState(0);
 
   const setSampleSchema = (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const s = (sampleSchemas as any)[id] ?? initialSchema;
     setSchema(toJsonString(s));
   };
@@ -34,7 +39,7 @@ export function App(props: AppProps): React.ReactElement {
                 setValue(e.getValue());
                 updatedInstance({ validate: connect.validate, e });
               }}
-              options={{ theme: "vs-dark" }}
+              options={{ theme: 'vs-dark' }}
             />
           </div>
         </div>
@@ -46,13 +51,17 @@ export function App(props: AppProps): React.ReactElement {
               suggest={connect.suggestSchema}
               onChange={(e) => {
                 setSchema(e.getValue());
-                updatedSchema({ validateSchema: connect.validateSchema, updateSchema: connect.updateSchema, e }).then((valid) => {
+                updatedSchema({
+                  validateSchema: connect.validateSchema,
+                  updateSchema: connect.updateSchema,
+                  e,
+                }).then((valid) => {
                   if (valid) {
                     setSchemaId(schemaId + 1);
                   }
                 });
               }}
-              options={{ theme: "vs-dark" }}
+              options={{ theme: 'vs-dark' }}
             />
           </div>
           <label htmlFor="sample-schema">Try one of these:</label>
@@ -77,7 +86,7 @@ export function App(props: AppProps): React.ReactElement {
         </div>
       </div>
       <div className="footer">
-        Powered by{" "}
+        Powered by{' '}
         <a href="https://share.unison-lang.org/@frawa/typed-json">
           <code>@frawa/typed-json</code>
         </a>
@@ -87,13 +96,13 @@ export function App(props: AppProps): React.ReactElement {
 }
 
 const initialValue = {
-  hello: "world",
+  hello: 'world',
 };
 
 const initialSchema = {
-  type: "boolean",
+  type: 'boolean',
 };
 
-function toJsonString(v: any): string {
+function toJsonString(v: unknown): string {
   return JSON.stringify(v, null, 2);
 }

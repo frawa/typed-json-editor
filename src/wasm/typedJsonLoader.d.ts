@@ -1,5 +1,5 @@
-declare module 'typedJsonLoader.js'
+declare module 'typedJsonLoader.js';
 
-declare function loadUnisonModule(source: any): Promise<any>;
+declare function loadUnisonModule(source: unknown): Promise<unknown>;
 
-export { loadUnisonModule }
+export { loadUnisonModule };

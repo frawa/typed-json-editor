@@ -1,67 +1,67 @@
 export const sampleSchemas = {
   properties: {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
     properties: {
-      foo: { type: "array", maxItems: 3 },
-      bar: { type: "array" },
+      foo: { type: 'array', maxItems: 3 },
+      bar: { type: 'array' },
     },
-    patternProperties: { "f.o": { minItems: 2 } },
-    additionalProperties: { type: "integer" },
+    patternProperties: { 'f.o': { minItems: 2 } },
+    additionalProperties: { type: 'integer' },
   },
-  "discriminated-union": {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
+  'discriminated-union': {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
     properties: {
       tag: {
-        type: "string",
-        enum: ["circle", "square"],
+        type: 'string',
+        enum: ['circle', 'square'],
       },
     },
-    required: ["tag"],
+    required: ['tag'],
     oneOf: [
       {
         properties: {
-          tag: { const: "circle" },
+          tag: { const: 'circle' },
           radius: {
-            type: "number",
+            type: 'number',
           },
         },
         additionalProperties: false,
       },
       {
         properties: {
-          tag: { const: "square" },
-          size: { type: "number" },
+          tag: { const: 'square' },
+          size: { type: 'number' },
         },
         additionalProperties: false,
       },
     ],
   },
-  "if-then-else": {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-    then: { const: "yes" },
-    else: { const: "other" },
+  'if-then-else': {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    then: { const: 'yes' },
+    else: { const: 'other' },
     if: { maxLength: 4 },
   },
-  "all-of": {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-    properties: { bar: { type: "integer" } },
-    required: ["bar"],
+  'all-of': {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    properties: { bar: { type: 'integer' } },
+    required: ['bar'],
     allOf: [
       {
         properties: {
-          foo: { type: "string" },
+          foo: { type: 'string' },
         },
-        required: ["foo"],
+        required: ['foo'],
       },
       {
         properties: {
-          baz: { type: "null" },
+          baz: { type: 'null' },
         },
-        required: ["baz"],
+        required: ['baz'],
       },
     ],
   },
-  "test-schema-4": {
+  'test-schema-4': {
     properties: {
       foo: {
         not: {
@@ -75,7 +75,7 @@ export const sampleSchemas = {
       },
     },
   },
-  "test-schema-6": {
+  'test-schema-6': {
     properties: {
       foo: {
         not: {
@@ -96,9 +96,9 @@ export const sampleSchemas = {
       },
     },
   },
-  "test-schema-7": {
+  'test-schema-7': {
     if: {
-      type: "array",
+      type: 'array',
     },
     then: {
       contains: {
@@ -108,128 +108,110 @@ export const sampleSchemas = {
     else: {
       properties: {
         foo: {
-          enum: ["foo1", "foo2"],
+          enum: ['foo1', 'foo2'],
         },
 
         gnu: {
           properties: {
             bar: {
-              enum: ["gnu1", "gnu2"],
+              enum: ['gnu1', 'gnu2'],
             },
           },
         },
       },
     },
   },
-  "polymorphism": {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://schema.animal.Animal",
-    "type": "object",
-    "allOf": [
+  polymorphism: {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    $id: 'http://schema.animal.Animal',
+    type: 'object',
+    allOf: [
       {
-        "if": {
-          "properties": {
-            "what": {
-              "type": "string",
-              "const": "schema.animal.Lion"
-            }
-          }
+        if: {
+          properties: {
+            what: {
+              type: 'string',
+              const: 'schema.animal.Lion',
+            },
+          },
         },
-        "then": {
-          "$ref": "#/$defs/schema.animal.Lion"
-        }
+        then: {
+          $ref: '#/$defs/schema.animal.Lion',
+        },
       },
       {
-        "if": {
-          "properties": {
-            "what": {
-              "type": "string",
-              "const": "schema.animal.Elephant"
-            }
-          }
+        if: {
+          properties: {
+            what: {
+              type: 'string',
+              const: 'schema.animal.Elephant',
+            },
+          },
         },
-        "then": {
-          "$ref": "#/$defs/schema.animal.Elephant"
-        }
-      }
+        then: {
+          $ref: '#/$defs/schema.animal.Elephant',
+        },
+      },
     ],
-    "$defs": {
-      "schema.animal.Animal": {
-        "properties": {
-          "name": {
-            "type": [
-              "string",
-              "null"
-            ]
+    $defs: {
+      'schema.animal.Animal': {
+        properties: {
+          name: {
+            type: ['string', 'null'],
           },
-          "sound": {
-            "type": [
-              "string",
-              "null"
-            ]
+          sound: {
+            type: ['string', 'null'],
           },
-          "type": {
-            "type": [
-              "string",
-              "null"
-            ]
+          type: {
+            type: ['string', 'null'],
           },
-          "endangered": {
-            "type": "boolean"
-          }
-        }
+          endangered: {
+            type: 'boolean',
+          },
+        },
       },
-      "schema.animal.Lion": {
-        "allOf": [
+      'schema.animal.Lion': {
+        allOf: [
           {
-            "$ref": "#/$defs/schema.animal.Animal"
-          }
-        ],
-        "properties": {
-          "mane": {
-            "type": "boolean"
-          }
-        }
-      },
-      "schema.animal.Elephant": {
-        "allOf": [
-          {
-            "$ref": "#/$defs/schema.animal.Animal"
-          }
-        ],
-        "properties": {
-          "trunkLength": {
-            "type": "number",
-            "format": "double"
+            $ref: '#/$defs/schema.animal.Animal',
           },
-          "tusk": {
-            "type": "boolean"
-          }
-        }
-      }
-    }
+        ],
+        properties: {
+          mane: {
+            type: 'boolean',
+          },
+        },
+      },
+      'schema.animal.Elephant': {
+        allOf: [
+          {
+            $ref: '#/$defs/schema.animal.Animal',
+          },
+        ],
+        properties: {
+          trunkLength: {
+            type: 'number',
+            format: 'double',
+          },
+          tusk: {
+            type: 'boolean',
+          },
+        },
+      },
+    },
   },
-  "test-schema-8": {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "prefixItems": [
+  'test-schema-8': {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    prefixItems: [
       {
-        "enum": [
-          13,
-          14
-        ]
+        enum: [13, 14],
       },
       {
-        "enum": [
-          "foo",
-          "bar"
-        ]
-      }
+        enum: ['foo', 'bar'],
+      },
     ],
-    "items": {
-      "enum": [
-        42,
-        43
-      ]
-    }
-  }
+    items: {
+      enum: [42, 43],
+    },
+  },
 };

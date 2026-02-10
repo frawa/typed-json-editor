@@ -6,42 +6,42 @@ body {
 }
 
 select {
-    background-color: black  ;
-    color: lightgreen
+  background-color: black;
+  color: lightgreen;
 }
 
 .page {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
 }
 
 .header {
-    width: 80%;
-    align-self: center;
+  width: 80%;
+  align-self: center;
 }
 
 .footer {
-    width: 80%;
-    align-self: center;
-    margin: 13px
+  width: 80%;
+  align-self: center;
+  margin: 13px;
 }
 
 .content {
-    display: flex;
-    flex-grow: 1;
+  display: flex;
+  flex-grow: 1;
 }
 
 .column {
-    width: 50%;
+  width: 50%;
 }
 
 .monaco-container {
-    height: 80%;
-    border: 1px solid #ccc;
-    margin: 0
+  height: 80%;
+  border: 1px solid #ccc;
+  margin: 0;
 }
 
 .monaco-container .monaco-editor .cursors-layer > .cursor {
-    background-color: red;
+  background-color: red;
 }

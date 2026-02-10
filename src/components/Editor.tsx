@@ -1,16 +1,15 @@
+import { FC, useEffect, useRef } from 'react';
+import { enableTypedJson, SuggestFun } from '../typeJson/typedJson';
+import styles from './Editor.module.css';
+import './userWorker';
 
-import { FC, useEffect, useRef } from "react";
-import { enableTypedJson, SuggestFun } from "../typeJson/typedJson";
-import styles from "./Editor.module.css";
-import "./userWorker";
+import { editor, IDisposable } from 'monaco-editor/esm/vs/editor/editor.api.js';
 
-import { editor, IDisposable } from "monaco-editor/esm/vs/editor/editor.api.js";
-
-import "monaco-editor/esm/vs/editor/browser/coreCommands.js";
-import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
+import 'monaco-editor/esm/vs/editor/browser/coreCommands.js';
+import 'monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js';
 // import "monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js";
 // import "monaco-editor/esm/vs/editor/contrib/find/browser/findController.js";
-// import "monaco-editor/esm/vs/editor/contrib/hover/browser/getHover.js";  
+// import "monaco-editor/esm/vs/editor/contrib/hover/browser/getHover.js";
 // import "monaco-editor/esm/vs/editor/contrib/linesOperations/browser/linesOperations.js";
 // import "monaco-editor/esm/vs/editor/contrib/smartSelect/browser/smartSelect.js";
 // import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
@@ -41,11 +40,11 @@ const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
   suggest: {
     filterGraceful: false,
     preview: true,
-    previewMode: "prefix", //"subwordSmart",
+    previewMode: 'prefix', //"subwordSmart",
     matchOnWordStartOnly: false,
     showWords: false,
   },
-  theme: "vs-dark",
+  theme: 'vs-dark',
   // theme: "vs",
   formatOnType: true,
   glyphMargin: false,
@@ -59,7 +58,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const subscriptionRef = useRef<IDisposable>(null);
-  const onChangeRef = useRef<EditorProps["onChange"]>(null);
+  const onChangeRef = useRef<EditorProps['onChange']>(null);
   onChangeRef.current = props.onChange;
 
   // inspired by https://github.com/react-monaco-editor/react-monaco-editor/blob/master/src/editor.tsx
@@ -69,7 +68,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
 
   const initMonaco = () => {
     if (containerRef.current) {
-      const model = editor.createModel(value, "json");
+      const model = editor.createModel(value, 'json');
 
       const editor1 = editor.create(containerRef.current, {
         ...defaultOptions,
@@ -78,7 +77,7 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
       });
 
       subscriptionRef.current = editor1.onDidChangeModelContent(() =>
-        onChangeRef.current?.(editor1),
+        onChangeRef.current?.(editor1)
       );
 
       editorRef.current = editor1;
@@ -105,15 +104,12 @@ export const Editor: FC<EditorProps> = (props: EditorProps) => {
       subscriptionRef.current?.dispose();
       editorRef.current?.dispose();
     },
-    [],
+    []
   );
 
   useEffect(() => {
     if (editorRef.current) {
-      const typedJson = enableTypedJson(
-        editorRef.current.getModel(),
-        suggest,
-      );
+      const typedJson = enableTypedJson(editorRef.current.getModel(), suggest);
       return () => {
         typedJson.dispose();
       };

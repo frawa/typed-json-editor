@@ -9,29 +9,29 @@ export interface SuggestPos {
   readonly replaceLength: number;
 }
 
-export type Offsets = {
+export interface Offsets {
   readonly offset: number;
   readonly length: number;
-};
+}
 
 export function getPointerOffsets(
   pointer: string,
-  tree: Node,
+  tree: Node
 ): Offsets | undefined {
   if (!tree) {
     return undefined;
-  } else if (pointer === "" || pointer === "/") {
+  } else if (pointer === '' || pointer === '/') {
     return { offset: tree.offset, length: tree.length };
-  } else if (!pointer.startsWith("/")) {
+  } else if (!pointer.startsWith('/')) {
     return undefined;
   } else {
-    const path = pointer.split("/").splice(1);
+    const path = pointer.split('/').splice(1);
     return getPathOffsets(path, tree);
   }
 }
 
 export function parseJson(t: string): Node | undefined {
-  const errors: ParseError[] = []
+  const errors: ParseError[] = [];
   const result = parseTree(t, errors);
   return errors.length === 0 ? result : undefined;
 }
@@ -39,38 +39,38 @@ export function parseTolerantJson(t: string): Node | undefined {
   return parseTree(t);
 }
 
-export function parseRepairedInstance(t: string): any {
-  const tree = parseTolerantJson(t)
-  return tree ? toRepairedInstance(tree) : {}
+export function parseRepairedInstance(t: string): unknown {
+  const tree = parseTolerantJson(t);
+  return tree ? toRepairedInstance(tree) : {};
 }
 
-function toRepairedInstance(n: Node): any {
+function toRepairedInstance(n: Node): unknown {
   switch (n.type) {
-    case "array": {
+    case 'array': {
       return n.children?.map(toRepairedInstance);
     }
-    case "object": {
-      let o: { [key: string]: any } = {};
+    case 'object': {
+      const o: Record<string, unknown> = {};
       n.children?.forEach((p) => {
-        const [keyNode, valueNode] = p.children ?? []
+        const [keyNode, valueNode] = p.children ?? [];
         o[keyNode.value] = valueNode ? toRepairedInstance(valueNode) : null;
       });
       return o;
     }
-    case "string": {
+    case 'string': {
       return n.value;
     }
-    case "number": {
+    case 'number': {
       return n.value;
     }
-    case "boolean": {
+    case 'boolean': {
       return n.value;
     }
-    case "null": {
+    case 'null': {
       return null;
     }
-    case "property": {
-      throw new Error("boom");
+    case 'property': {
+      throw new Error('boom');
     }
   }
 }
@@ -97,12 +97,12 @@ function insidePos(inside: boolean, pos: SuggestPos): SuggestPos {
 
 export function getSuggestPosAt(
   offset: number,
-  tree: Node,
+  tree: Node
 ): SuggestPos | undefined {
   const go = (offset: number, n: Node, pos: SuggestPos) => {
     if (contains(offset, n)) {
       switch (n.type) {
-        case "array": {
+        case 'array': {
           const found = findNodeInChildren(offset, n.children ?? []);
           if (found) {
             const [item, i] = found;
@@ -112,7 +112,7 @@ export function getSuggestPosAt(
             return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
-        case "object": {
+        case 'object': {
           const found = findNodeInChildren(offset, n.children ?? []);
           if (found) {
             const [property] = found;
@@ -122,8 +122,8 @@ export function getSuggestPosAt(
             return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
-        case "property": {
-          const [keyNode, valueNode] = n.children ?? []
+        case 'property': {
+          const [keyNode, valueNode] = n.children ?? [];
           if (contains(offset, keyNode)) {
             return replaceAt(keyNode, { ...pos, inside: true });
           } else if (valueNode && contains(offset, valueNode)) {
@@ -148,19 +148,19 @@ export function getSuggestPosAt(
   };
   if (tree) {
     const pos: SuggestPos = {
-      pointer: "",
+      pointer: '',
       inside: false,
       replaceOffset: offset,
       replaceLength: 0,
     };
     return go(offset, tree, pos);
   }
-  return { pointer: "", inside: false, replaceOffset: 0, replaceLength: 0 };
+  return { pointer: '', inside: false, replaceOffset: 0, replaceLength: 0 };
 }
 
 function findNodeInChildren(
   offset: number,
-  cs: Node[],
+  cs: Node[]
 ): [Node, number] | undefined {
   for (let i = 0; i < cs.length && cs[i].offset <= offset; i++) {
     const found = contains(offset, cs[i]);
@@ -173,7 +173,7 @@ function findNodeInChildren(
 
 function getPathOffsets(
   path: string[],
-  n: Node | undefined,
+  n: Node | undefined
 ): Offsets | undefined {
   if (n) {
     if (path.length === 0) {
@@ -181,14 +181,16 @@ function getPathOffsets(
     }
     const [head, ...tail] = path;
     switch (n.type) {
-      case "array": {
+      case 'array': {
         const i = Number.parseInt(head);
 
-        const items = n.children as Node[] ?? []
+        const items = (n.children as Node[]) ?? [];
         return getPathOffsets(tail, items[i]);
       }
-      case "object": {
-        const properties = (n.children?.map(p => p.children) ?? []) as [[Node, Node]]
+      case 'object': {
+        const properties = (n.children?.map((p) => p.children) ?? []) as [
+          [Node, Node],
+        ];
         const prop = properties.find(([k]) => k.value === head) ?? [];
         const [keyNode, valueNode] = prop;
         const v = valueNode ?? keyNode;

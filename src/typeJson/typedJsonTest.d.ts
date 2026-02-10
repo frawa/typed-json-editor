@@ -1,1 +1,1 @@
-declare module "vscode-json-languageservice/lib/esm/parser/jsonParser.js";
+declare module 'vscode-json-languageservice/lib/esm/parser/jsonParser.js';
