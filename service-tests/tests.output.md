@@ -209,7 +209,12 @@ typed-json-service/wip> run tests.suggestAll @schema7.json {"gnu":{"bar":42},"fo
     , Json.Array
         [ Json.Object
             [ ("location", Json.Text "/else/properties")
-            , ("values", Json.Array [Json.Object []])
+            , ( "values"
+              , Json.Array
+                  [ Json.Object
+                      [("foo", Json.Null), ("gnu", Json.Null)]
+                  ]
+              )
             ]
         , Json.Object
             [ ("location", Json.Text "/if/type")
@@ -233,7 +238,9 @@ typed-json-service/wip> run tests.suggestAll @schema7.json {"gnu":{"bar":42},"fo
             [ ( "location"
               , Json.Text "/else/properties/gnu/properties"
               )
-            , ("values", Json.Array [Json.Object []])
+            , ( "values"
+              , Json.Array [Json.Object [("bar", Json.Null)]]
+              )
             ]
         ]
     )
