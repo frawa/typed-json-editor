@@ -41,6 +41,10 @@ function addMeta(
   }
 }
 
+function ellipseText(text: string, max: number): string {
+  return text.length > max ? text.substring(0, max - 3) + '...' : text;
+}
+
 export function suggestionsToCompletionItems(
   suggestions: readonly SuggestionOutput[],
   pos: SuggestPos,
@@ -49,24 +53,31 @@ export function suggestionsToCompletionItems(
   const go = ({ value, locations, meta }: ValueWithMeta) => {
     const pretty = JSON.stringify(value, null, 2);
     const compact = JSON.stringify(value, null, 0);
-    const label =
-      compact.length > 42 ? compact.substring(0, 39) + '...' : compact;
+    const label = ellipseText(compact, 42);
     const location = locations?.[0] ?? '';
     const keyword = location.substring(location.lastIndexOf('/') + 1);
-    const docMeta = meta.join('\n');
-    const docLocations = locations.join('\n');
-    const doc = [docMeta, docLocations].join('\n\n');
+    const doc = [
+      locations.map((t) => `\`${t}\`\n`),
+      '',
+      '```',
+      pretty,
+      '```',
+      '',
+      ...meta.map((t) => '* ' + t),
+    ].join('\n');
+    const labelDetail = ellipseText(meta?.[0] ?? '', 25);
     const item: languages.CompletionItem = {
       kind: languages.CompletionItemKind.Value,
       label: {
         label,
-        description: pos.pointer,
-        //description: TODO keyword,
-        // detail: "TODO label detail",
+        detail: keyword,
+        description: labelDetail,
+        // description: keyword,
+        // detail: labelDetail,
       },
-      detail: `${keyword}`,
+      detail: `${pos.pointer} ${keyword}`,
       documentation: {
-        value: `${doc}\n\n\`\`\`${pretty}\`\`\`\n`,
+        value: doc,
       },
       insertText: pretty,
       range,
