@@ -310,3 +310,97 @@ typed-json-service/wip> run tests.suggestAll @schema7.json {"gnu":{"bar":42},"fo
     )
   ]
 ```
+
+``` ucm
+typed-json-service/wip> run tests.suggestAll @schemaPolymorphism.json {}
+
+  [ ( SuggestPos (Pointer.Pointer []) false
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/type")
+            , ("values", Json.Array [Json.Object []])
+            ]
+        , Json.Object
+            [ ("location", Json.Text "/allOf/if/properties")
+            , ( "values"
+              , Json.Array [Json.Object [("what", Json.Null)]]
+              )
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text "/allOf/then/$ref/properties"
+              )
+            , ( "values"
+              , Json.Array
+                  [ Json.Object
+                      [ ("trunkLength", Json.Null)
+                      , ("tusk", Json.Null)
+                      ]
+                  ]
+              )
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text "/allOf/then/$ref/properties"
+              )
+            , ( "values"
+              , Json.Array [Json.Object [("mane", Json.Null)]]
+              )
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text
+                  "/allOf/then/$ref/allOf/$ref/properties"
+              )
+            , ( "values"
+              , Json.Array
+                  [ Json.Object
+                      [ ("endangered", Json.Null)
+                      , ("name", Json.Null)
+                      , ("sound", Json.Null)
+                      , ("type", Json.Null)
+                      ]
+                  ]
+              )
+            ]
+        ]
+    )
+  , ( SuggestPos (Pointer.Pointer []) true
+    , Json.Array
+        [ Json.Object
+            [ ("location", Json.Text "/allOf/if/properties")
+            , ("values", Json.Array [Json.Text "what"])
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text "/allOf/then/$ref/properties"
+              )
+            , ( "values"
+              , Json.Array
+                  [Json.Text "trunkLength", Json.Text "tusk"]
+              )
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text "/allOf/then/$ref/properties"
+              )
+            , ("values", Json.Array [Json.Text "mane"])
+            ]
+        , Json.Object
+            [ ( "location"
+              , Json.Text
+                  "/allOf/then/$ref/allOf/$ref/properties"
+              )
+            , ( "values"
+              , Json.Array
+                  [ Json.Text "endangered"
+                  , Json.Text "name"
+                  , Json.Text "sound"
+                  , Json.Text "type"
+                  ]
+              )
+            ]
+        ]
+    )
+  ]
+```
