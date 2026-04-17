@@ -1,5 +1,4 @@
 {
   "instance": { "gnu": {} },
-  "pointer": "/gnu",
-  "inside": true
+  "pointer": "/gnu"
 }
