@@ -51,7 +51,7 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
   ): Promise<readonly SuggestionOutput[]> {
     const body = {
       instance: parseRepairedInstance(instance),
-      pointer: pointerText(pos.pointer),
+      pointer: pointerText(pos),
     };
     try {
       const result = this.localSuggest([this.schema, JSON.stringify(body)]);
@@ -71,7 +71,7 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
   ): Promise<readonly SuggestionOutput[]> {
     const body = {
       instance: parseRepairedInstance(instance),
-      pointer: pointerText(pos.pointer),
+      pointer: pointerText(pos),
     };
     try {
       const result = this.localSuggestSchema(JSON.stringify(body));

@@ -30,7 +30,7 @@ export async function apiSuggestion(
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
     instance: parseRepairedInstance(instance),
-    pointer: pointerText(pos.pointer),
+    pointer: pointerText(pos),
   };
   const response = await fetch('api/suggest', {
     method: 'POST',
@@ -50,7 +50,7 @@ export async function apiSuggestSchema(
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
     instance: parseRepairedInstance(instance),
-    pointer: pointerText(pos.pointer),
+    pointer: pointerText(pos),
   };
   const response = await fetch('api/suggestSchema', {
     method: 'POST',

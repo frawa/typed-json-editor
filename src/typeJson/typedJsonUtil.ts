@@ -76,6 +76,46 @@ export function toRepairedInstance(n: Node): unknown {
   }
 }
 
+export function insertNullAt(
+  pointer: readonly PointerSegment[],
+  index: number,
+  node: Node
+): Node {
+  const go = (rest: readonly PointerSegment[], n: Node) => {
+    if (rest.length == 0) {
+      if (n.type === 'array' && n.children) {
+        const cs = n.children;
+        cs.push({ type: 'null', offset: 0, length: 0 });
+        cs.copyWithin(index + 1, index);
+        cs.fill({ type: 'null', offset: 0, length: 0 }, index, index + 1);
+      }
+    } else {
+      const head = rest[0];
+      const tail = rest.slice(1);
+      switch (n.type) {
+        case 'object': {
+          n.children?.find((p) => {
+            const [keyNode, valueNode] = p.children ?? [];
+            if (keyNode.value == head) {
+              go(tail, valueNode);
+            }
+          });
+          break;
+        }
+        case 'array': {
+          const v = typeof head === 'number' ? n.children?.at(head) : undefined;
+          if (v) {
+            go(rest, v);
+          }
+          break;
+        }
+      }
+    }
+  };
+  go(pointer, node);
+  return node;
+}
+
 function contains(offset: number, n: Node): boolean {
   return n.offset <= offset && offset < n.offset + n.length;
 }
@@ -96,10 +136,12 @@ function insideObjectPos(pos: SuggestPos): SuggestPos {
   return { ...pos, inside: 'object' };
 }
 function insideArrayPos(arrayIndex: number, pos: SuggestPos): SuggestPos {
-  return { ...pos, pointer: [...pos.pointer, arrayIndex], inside: arrayIndex };
+  return { ...pos, inside: arrayIndex };
 }
 
-export function pointerText(pointer: SuggestPos['pointer']): string {
+export function pointerText(pos: SuggestPos): string {
+  const pointer =
+    typeof pos.inside === 'number' ? [...pos.pointer, pos.inside] : pos.pointer;
   return pointer.length == 0 ? '' : '/' + pointer.join('/');
 }
 
@@ -188,14 +230,14 @@ function findChildIndexAfter(offset: number, cs: Node[]): number {
     const found = offset <= cs[i].offset;
     if (found) {
       // TODO without mutation!
-      cs.push({ type: 'null', offset, length: 0 });
-      cs.copyWithin(i + 1, i);
-      cs.fill({ type: 'null', offset, length: 0 }, i, i + 1);
+      // cs.push({ type: 'null', offset, length: 0 });
+      // cs.copyWithin(i + 1, i);
+      // cs.fill({ type: 'null', offset, length: 0 }, i, i + 1);
       return i;
     }
   }
   // TODO without mutation!
-  cs.push({ type: 'null', offset, length: 0 });
+  // cs.push({ type: 'null', offset, length: 0 });
   return cs.length;
 }
 

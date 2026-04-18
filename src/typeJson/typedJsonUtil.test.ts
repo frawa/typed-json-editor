@@ -21,7 +21,7 @@ describe('typedJson utils', () => {
     const value = '13';
     const tree = parse(value);
     const expected = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 2,
     };
@@ -34,7 +34,7 @@ describe('typedJson utils', () => {
     const value = '[13,14]';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 7,
     };
@@ -45,17 +45,17 @@ describe('typedJson utils', () => {
       replaceLength: 0,
     };
     const expected1 = {
-      pointer: '/0',
+      pointer: [0],
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
-      pointer: '/1',
+      pointer: [1],
       replaceOffset: 4,
       replaceLength: 2,
     };
     const expected3 = {
-      pointer: '',
+      pointer: [],
       inside: 2,
       replaceOffset: 6,
       replaceLength: 0,
@@ -74,12 +74,12 @@ describe('typedJson utils', () => {
     const value = '[13';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
-      pointer: '/0',
+      pointer: [0],
       replaceOffset: 1,
       replaceLength: 2,
     };
@@ -93,7 +93,7 @@ describe('typedJson utils', () => {
     const value = '[13,,14';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 7,
     };
@@ -110,12 +110,12 @@ describe('typedJson utils', () => {
       replaceLength: 0,
     };
     const expected1 = {
-      pointer: '/0',
+      pointer: [0],
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
-      pointer: '/1',
+      pointer: [1],
       replaceOffset: 5,
       replaceLength: 2,
     };
@@ -133,23 +133,23 @@ describe('typedJson utils', () => {
     const value = '{"foo":13}';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 10,
     };
     const expected1 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: '/foo',
+      pointer: ['foo'],
       replaceOffset: 7,
       replaceLength: 2,
     };
     const expected3 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 9,
       replaceLength: 0,
@@ -171,18 +171,18 @@ describe('typedJson utils', () => {
     const value = '{"foo":}';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: '/foo',
+      pointer: ['foo'],
       replaceOffset: 7,
       replaceLength: 0,
     };
@@ -200,18 +200,18 @@ describe('typedJson utils', () => {
     const value = '{"foo" }';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
@@ -231,18 +231,18 @@ describe('typedJson utils', () => {
     const value = '{ }';
     const tree = parse(value);
     const expected0 = {
-      pointer: '',
+      pointer: [],
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 1,
       replaceLength: 0,
     };
     const expected2 = {
-      pointer: '',
+      pointer: [],
       inside: 'object',
       replaceOffset: 2,
       replaceLength: 0,

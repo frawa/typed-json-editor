@@ -16,6 +16,7 @@ import { TypedJsonConnectApi } from './TypedJsonConnectApi';
 import { TypedJsonConnectLocal } from './TypedJsonConnectLocal';
 import {
   getSuggestPosAt,
+  insertNullAt,
   parseJson,
   parseTolerantJson,
   SuggestPos,
@@ -74,8 +75,7 @@ export function enableTypedJson(
           tree && typeof suggestPos.inside == 'number'
             ? JSON.stringify(
                 toRepairedInstance(
-                  // insertNullAt(suggestPos.pointer, suggestPos.inside, tree)
-                  tree
+                  insertNullAt(suggestPos.pointer, suggestPos.inside, tree)
                 )
               )
             : text;
