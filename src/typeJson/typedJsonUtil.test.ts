@@ -22,7 +22,6 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 2,
     };
@@ -36,31 +35,28 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 7,
     };
     const expected0b = {
       ...expected0,
-      inside: true,
+      inside: 'array',
       replaceOffset: 3,
       replaceLength: 0,
     };
     const expected1 = {
       pointer: '/0',
-      inside: false,
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
       pointer: '/1',
-      inside: false,
       replaceOffset: 4,
       replaceLength: 2,
     };
     const expected3 = {
       pointer: '',
-      inside: true,
+      inside: 'array',
       replaceOffset: 6,
       replaceLength: 0,
     };
@@ -79,13 +75,11 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
       pointer: '/0',
-      inside: false,
       replaceOffset: 1,
       replaceLength: 2,
     };
@@ -100,31 +94,28 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 7,
     };
     const expected0b = {
       ...expected0,
-      inside: true,
+      inside: 'array',
       replaceOffset: 3,
       replaceLength: 0,
     };
     const expected0c = {
       ...expected0,
-      inside: true,
+      inside: 'array',
       replaceOffset: 4,
       replaceLength: 0,
     };
     const expected1 = {
       pointer: '/0',
-      inside: false,
       replaceOffset: 1,
       replaceLength: 2,
     };
     const expected2 = {
       pointer: '/1',
-      inside: false,
       replaceOffset: 5,
       replaceLength: 2,
     };
@@ -143,25 +134,23 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 10,
     };
     const expected1 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
       pointer: '/foo',
-      inside: false,
       replaceOffset: 7,
       replaceLength: 2,
     };
     const expected3 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 9,
       replaceLength: 0,
     };
@@ -183,19 +172,17 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
       pointer: '/foo',
-      inside: false,
       replaceOffset: 7,
       replaceLength: 0,
     };
@@ -214,19 +201,18 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 8,
     };
     const expected1 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
     const expected2 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 1,
       replaceLength: 5,
     };
@@ -246,19 +232,18 @@ describe('typedJson utils', () => {
     const tree = parse(value);
     const expected0 = {
       pointer: '',
-      inside: false,
       replaceOffset: 0,
       replaceLength: 3,
     };
     const expected1 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 1,
       replaceLength: 0,
     };
     const expected2 = {
       pointer: '',
-      inside: true,
+      inside: 'object',
       replaceOffset: 2,
       replaceLength: 0,
     };

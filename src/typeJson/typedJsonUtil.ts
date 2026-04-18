@@ -4,7 +4,7 @@ import { Node, ParseError, parseTree } from 'jsonc-parser';
 
 export interface SuggestPos {
   readonly pointer: string;
-  readonly inside: boolean;
+  readonly inside?: 'object' | 'array';
   readonly replaceOffset: number;
   readonly replaceLength: number;
 }
@@ -91,8 +91,11 @@ function appendPointer(segment: string | number, pos: SuggestPos): SuggestPos {
   const pointer = `${pos.pointer}/${segment}`;
   return { ...pos, pointer };
 }
-function insidePos(inside: boolean, pos: SuggestPos): SuggestPos {
-  return { ...pos, inside };
+function insideObjectPos(pos: SuggestPos): SuggestPos {
+  return { ...pos, inside: 'object' };
+}
+function insideArrayPos(pos: SuggestPos): SuggestPos {
+  return { ...pos, inside: 'array' };
 }
 
 export function getSuggestPosAt(
@@ -108,7 +111,7 @@ export function getSuggestPosAt(
             const [item, i] = found;
             return go(offset, item, appendPointer(i, pos));
           } else {
-            const pos1 = insidePos(isInside(offset, n), pos);
+            const pos1 = isInside(offset, n) ? insideArrayPos(pos) : pos;
             return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
@@ -118,14 +121,14 @@ export function getSuggestPosAt(
             const [property] = found;
             return go(offset, property, pos);
           } else {
-            const pos1 = insidePos(isInside(offset, n), pos);
+            const pos1 = isInside(offset, n) ? insideObjectPos(pos) : pos;
             return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
         case 'property': {
           const [keyNode, valueNode] = n.children ?? [];
           if (contains(offset, keyNode)) {
-            return replaceAt(keyNode, { ...pos, inside: true });
+            return replaceAt(keyNode, insideObjectPos(pos));
           } else if (valueNode && contains(offset, valueNode)) {
             return go(offset, valueNode, appendPointer(keyNode.value, pos));
           } else {
@@ -136,7 +139,7 @@ export function getSuggestPosAt(
             const pos1 = inside
               ? replaceAt(keyNode, pos)
               : appendPointer(keyNode.value, pos);
-            return insidePos(inside, pos1);
+            return inside ? insideObjectPos(pos1) : pos1;
           }
         }
         default: {
@@ -149,13 +152,12 @@ export function getSuggestPosAt(
   if (tree) {
     const pos: SuggestPos = {
       pointer: '',
-      inside: false,
       replaceOffset: offset,
       replaceLength: 0,
     };
     return go(offset, tree, pos);
   }
-  return { pointer: '', inside: false, replaceOffset: 0, replaceLength: 0 };
+  return { pointer: '', replaceOffset: 0, replaceLength: 0 };
 }
 
 function findNodeInChildren(
