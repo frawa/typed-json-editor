@@ -62,23 +62,22 @@ export function enableTypedJson(
       const tree = parseTolerantJson(text);
       const offset = m.getOffsetAt(position);
 
-      if (tree) {
-        const suggestPos = getSuggestPosAt(offset, tree);
-        if (suggestPos) {
-          const output = await suggest(text, suggestPos);
-          const { replaceOffset, replaceLength } = suggestPos;
-          const from = m.getPositionAt(replaceOffset);
-          const to = m.getPositionAt(replaceOffset + replaceLength);
-          const range = Range.fromPositions(from, to);
-          if (output.length > 0) {
-            const items = suggestionsToCompletionItems(
-              output,
-              suggestPos,
-              range
-            );
-            // console.log("suggesting", suggestPos, items);
-            return Promise.resolve({ suggestions: items });
-          }
+      const suggestPos = tree
+        ? getSuggestPosAt(offset, tree)
+        : text.length == 0
+          ? { pointer: '', replaceOffset: 0, replaceLength: 0 }
+          : undefined;
+
+      if (suggestPos) {
+        const output = await suggest(text, suggestPos);
+        const { replaceOffset, replaceLength } = suggestPos;
+        const from = m.getPositionAt(replaceOffset);
+        const to = m.getPositionAt(replaceOffset + replaceLength);
+        const range = Range.fromPositions(from, to);
+        if (output.length > 0) {
+          const items = suggestionsToCompletionItems(output, suggestPos, range);
+          // console.log("suggesting", suggestPos, items);
+          return Promise.resolve({ suggestions: items });
         }
       }
     },
