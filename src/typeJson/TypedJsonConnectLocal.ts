@@ -69,7 +69,6 @@ export class TypedJsonConnectLocal implements TypedJsonConnect {
     const body = {
       instance: parseRepairedInstance(instance),
       pointer: pos.pointer,
-      inside: pos.inside,
     };
     try {
       const result = this.localSuggestSchema(JSON.stringify(body));

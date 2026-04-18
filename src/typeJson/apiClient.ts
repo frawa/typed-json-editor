@@ -27,7 +27,6 @@ export async function apiSuggestion(
   const body = {
     instance: parseRepairedInstance(instance),
     pointer: pos.pointer,
-    inside: pos.inside,
   };
   const response = await fetch('api/suggest', {
     method: 'POST',
