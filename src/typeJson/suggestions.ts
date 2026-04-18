@@ -50,6 +50,10 @@ export function suggestionsToCompletionItems(
   pos: SuggestPos,
   range: IRange
 ): languages.CompletionItem[] {
+  const propertyNamesOnly =
+    pos.inside === 'object'
+      ? (v: ValueWithMeta) => getPropertyNames(v)
+      : (v: ValueWithMeta) => [v];
   const go = ({ value, locations, meta }: ValueWithMeta) => {
     const pretty = JSON.stringify(value, null, 2);
     const compact = JSON.stringify(value, null, 0);
@@ -84,7 +88,7 @@ export function suggestionsToCompletionItems(
     };
     return item;
   };
-  const items = toValueWithMeta(suggestions).map(go);
+  const items = toValueWithMeta(suggestions).flatMap(propertyNamesOnly).map(go);
   return [...items];
 }
 
@@ -103,6 +107,12 @@ export function toValueWithMeta(
     .map((vs) => vs.reduce(merge, { value: {}, locations: [], meta: [] }))
     .toArray();
   return merged;
+}
+
+function getPropertyNames(v: ValueWithMeta): readonly ValueWithMeta[] {
+  return typeof v.value === 'object'
+    ? Object.keys(v.value as object).map((k) => ({ ...v, value: k }))
+    : [];
 }
 
 function groupBy<K, V>(
