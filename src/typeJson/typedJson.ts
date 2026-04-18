@@ -19,6 +19,7 @@ import {
   parseJson,
   parseTolerantJson,
   SuggestPos,
+  toRepairedInstance,
 } from './typedJsonUtil';
 
 export type SuggestFun = (
@@ -65,11 +66,20 @@ export function enableTypedJson(
       const suggestPos = tree
         ? getSuggestPosAt(offset, tree)
         : text.length == 0
-          ? { pointer: '', replaceOffset: 0, replaceLength: 0 }
+          ? { pointer: [], replaceOffset: 0, replaceLength: 0 }
           : undefined;
 
       if (suggestPos) {
-        const output = await suggest(text, suggestPos);
+        const text1 =
+          tree && typeof suggestPos.inside == 'number'
+            ? JSON.stringify(
+                toRepairedInstance(
+                  // insertNullAt(suggestPos.pointer, suggestPos.inside, tree)
+                  tree
+                )
+              )
+            : text;
+        const output = await suggest(text1, suggestPos);
         const { replaceOffset, replaceLength } = suggestPos;
         const from = m.getPositionAt(replaceOffset);
         const to = m.getPositionAt(replaceOffset + replaceLength);

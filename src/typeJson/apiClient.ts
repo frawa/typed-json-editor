@@ -1,6 +1,10 @@
 import { BasicOutput, parseBasicOutput } from './basicOutput';
 import { parseSuggestionOutput, SuggestionOutput } from './suggestions';
-import { parseRepairedInstance, SuggestPos } from './typedJsonUtil';
+import {
+  parseRepairedInstance,
+  pointerText,
+  SuggestPos,
+} from './typedJsonUtil';
 
 export async function apiSchema(schema: string): Promise<string> {
   return fetch('api/schema', {
@@ -26,7 +30,7 @@ export async function apiSuggestion(
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
     instance: parseRepairedInstance(instance),
-    pointer: pos.pointer,
+    pointer: pointerText(pos.pointer),
   };
   const response = await fetch('api/suggest', {
     method: 'POST',
@@ -46,8 +50,7 @@ export async function apiSuggestSchema(
 ): Promise<readonly SuggestionOutput[]> {
   const body = {
     instance: parseRepairedInstance(instance),
-    pointer: pos.pointer,
-    inside: pos.inside,
+    pointer: pointerText(pos.pointer),
   };
   const response = await fetch('api/suggestSchema', {
     method: 'POST',

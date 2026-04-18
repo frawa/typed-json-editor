@@ -2,9 +2,10 @@
 // import { getNodePath } from "vscode-json-languagesefrvice/lib/esm/parser/jsonParser.js";
 import { Node, ParseError, parseTree } from 'jsonc-parser';
 
+type PointerSegment = string | number;
 export interface SuggestPos {
-  readonly pointer: string;
-  readonly inside?: 'object' | 'array';
+  readonly pointer: readonly PointerSegment[];
+  readonly inside?: 'object' | number;
   readonly replaceOffset: number;
   readonly replaceLength: number;
 }
@@ -44,7 +45,7 @@ export function parseRepairedInstance(t: string): unknown {
   return tree ? toRepairedInstance(tree) : {};
 }
 
-function toRepairedInstance(n: Node): unknown {
+export function toRepairedInstance(n: Node): unknown {
   switch (n.type) {
     case 'array': {
       return n.children?.map(toRepairedInstance);
@@ -88,14 +89,18 @@ function replaceAt(n: Node, pos: SuggestPos): SuggestPos {
 }
 
 function appendPointer(segment: string | number, pos: SuggestPos): SuggestPos {
-  const pointer = `${pos.pointer}/${segment}`;
+  const pointer = [...pos.pointer, segment];
   return { ...pos, pointer };
 }
 function insideObjectPos(pos: SuggestPos): SuggestPos {
   return { ...pos, inside: 'object' };
 }
-function insideArrayPos(pos: SuggestPos): SuggestPos {
-  return { ...pos, inside: 'array' };
+function insideArrayPos(arrayIndex: number, pos: SuggestPos): SuggestPos {
+  return { ...pos, pointer: [...pos.pointer, arrayIndex], inside: arrayIndex };
+}
+
+export function pointerText(pointer: SuggestPos['pointer']): string {
+  return pointer.length == 0 ? '' : '/' + pointer.join('/');
 }
 
 export function getSuggestPosAt(
@@ -111,7 +116,12 @@ export function getSuggestPosAt(
             const [item, i] = found;
             return go(offset, item, appendPointer(i, pos));
           } else {
-            const pos1 = isInside(offset, n) ? insideArrayPos(pos) : pos;
+            const pos1 = isInside(offset, n)
+              ? insideArrayPos(
+                  findChildIndexAfter(offset, n.children ?? []),
+                  pos
+                )
+              : pos;
             return pos1.inside ? pos1 : replaceAt(n, pos1);
           }
         }
@@ -151,13 +161,13 @@ export function getSuggestPosAt(
   };
   if (tree) {
     const pos: SuggestPos = {
-      pointer: '',
+      pointer: [],
       replaceOffset: offset,
       replaceLength: 0,
     };
     return go(offset, tree, pos);
   }
-  return { pointer: '', replaceOffset: 0, replaceLength: 0 };
+  return { pointer: [], replaceOffset: 0, replaceLength: 0 };
 }
 
 function findNodeInChildren(
@@ -171,6 +181,22 @@ function findNodeInChildren(
     }
   }
   return undefined;
+}
+
+function findChildIndexAfter(offset: number, cs: Node[]): number {
+  for (let i = 0; i < cs.length; i++) {
+    const found = offset <= cs[i].offset;
+    if (found) {
+      // TODO without mutation!
+      cs.push({ type: 'null', offset, length: 0 });
+      cs.copyWithin(i + 1, i);
+      cs.fill({ type: 'null', offset, length: 0 }, i, i + 1);
+      return i;
+    }
+  }
+  // TODO without mutation!
+  cs.push({ type: 'null', offset, length: 0 });
+  return cs.length;
 }
 
 function getPathOffsets(

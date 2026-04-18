@@ -40,7 +40,7 @@ describe('typedJson utils', () => {
     };
     const expected0b = {
       ...expected0,
-      inside: 'array',
+      inside: 1,
       replaceOffset: 3,
       replaceLength: 0,
     };
@@ -56,7 +56,7 @@ describe('typedJson utils', () => {
     };
     const expected3 = {
       pointer: '',
-      inside: 'array',
+      inside: 2,
       replaceOffset: 6,
       replaceLength: 0,
     };
@@ -99,13 +99,13 @@ describe('typedJson utils', () => {
     };
     const expected0b = {
       ...expected0,
-      inside: 'array',
+      inside: 1,
       replaceOffset: 3,
       replaceLength: 0,
     };
     const expected0c = {
       ...expected0,
-      inside: 'array',
+      inside: 1,
       replaceOffset: 4,
       replaceLength: 0,
     };

@@ -53,7 +53,9 @@ export function suggestionsToCompletionItems(
   const propertyNamesOnly =
     pos.inside === 'object'
       ? (v: ValueWithMeta) => getPropertyNames(v)
-      : (v: ValueWithMeta) => [v];
+      : typeof pos.inside === 'number'
+        ? (v: ValueWithMeta) => getArrayItemValues(v)
+        : (v: ValueWithMeta) => [v];
   const go = ({ value, locations, meta }: ValueWithMeta) => {
     const pretty = JSON.stringify(value, null, 2);
     const compact = JSON.stringify(value, null, 0);
@@ -112,7 +114,13 @@ export function toValueWithMeta(
 function getPropertyNames(v: ValueWithMeta): readonly ValueWithMeta[] {
   return typeof v.value === 'object'
     ? Object.keys(v.value as object).map((k) => ({ ...v, value: k }))
-    : [];
+    : [v];
+}
+
+function getArrayItemValues(v: ValueWithMeta): readonly ValueWithMeta[] {
+  return Array.isArray(v.value)
+    ? (v.value as unknown[]).map((item) => ({ ...v, value: item }))
+    : [v];
 }
 
 function groupBy<K, V>(
