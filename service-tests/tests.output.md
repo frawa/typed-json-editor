@@ -45,9 +45,77 @@ typed-json-service/wip> run tests.validateAll @schema1.json @instance1.json
       ]
   , Json.Object
       [ ("valid", Json.Boolean true)
-      , ("keywordLocation", Json.Text "/(ignored \"$schema\")")
+      , ("keywordLocation", Json.Text "")
       , ("instanceLocation", Json.Text "")
-      , ("annotation", Json.Text "(ignored \"$schema\")")
+      , ( "annotations"
+        , Json.Array
+            [ Json.Object
+                [ ("valid", Json.Boolean true)
+                , ( "keywordLocation"
+                  , Json.Text "/(ignored \"$schema\")"
+                  )
+                , ("instanceLocation", Json.Text "")
+                , ( "annotation"
+                  , Json.Text "(ignored \"$schema\")"
+                  )
+                ]
+            , Json.Object
+                [ ("valid", Json.Boolean true)
+                , ("keywordLocation", Json.Text "/properties")
+                , ("instanceLocation", Json.Text "")
+                , ( "annotations"
+                  , Json.Array
+                      [ Json.Object
+                          [ ("valid", Json.Boolean true)
+                          , ( "keywordLocation"
+                            , Json.Text "/properties/foo2"
+                            )
+                          , ( "instanceLocation"
+                            , Json.Text "/foo2"
+                            )
+                          ]
+                      ]
+                  )
+                ]
+            , Json.Object
+                [ ("valid", Json.Boolean true)
+                , ( "keywordLocation"
+                  , Json.Text "/dependentSchemas"
+                  )
+                , ("instanceLocation", Json.Text "")
+                , ( "annotations"
+                  , Json.Array
+                      [ Json.Object
+                          [ ("valid", Json.Boolean true)
+                          , ( "keywordLocation"
+                            , Json.Text "/dependentSchemas/foo2"
+                            )
+                          , ("instanceLocation", Json.Text "")
+                          , ( "annotations"
+                            , Json.Array
+                                [ Json.Object
+                                    [ ( "valid"
+                                      , Json.Boolean true
+                                      )
+                                    , ( "keywordLocation"
+                                      , Json.Text
+                                          "/dependentSchemas/foo2/properties"
+                                      )
+                                    , ( "instanceLocation"
+                                      , Json.Text ""
+                                      )
+                                    , ( "annotation"
+                                      , Json.Array []
+                                      )
+                                    ]
+                                ]
+                            )
+                          ]
+                      ]
+                  )
+                ]
+            ]
+        )
       ]
   ]
 ```
@@ -80,31 +148,117 @@ typed-json-service/wip> run tests.validateAll @schemaDetailed.json @instanceDeta
       ]
   , Json.Object
       [ ("valid", Json.Boolean false)
-      , ("keywordLocation", Json.Text "/patternProperties")
+      , ("keywordLocation", Json.Text "")
       , ("instanceLocation", Json.Text "")
       , ( "errors"
         , Json.Array
             [ Json.Object
-                [ ("valid", Json.Boolean true)
-                , ( "keywordLocation"
-                  , Json.Text "/patternProperties/f.*o/type"
-                  )
-                , ("instanceLocation", Json.Text "/foo")
-                ]
-            , Json.Object
                 [ ("valid", Json.Boolean false)
                 , ( "keywordLocation"
-                  , Json.Text "/patternProperties/f.*o/type"
+                  , Json.Text "/patternProperties"
                   )
-                , ("instanceLocation", Json.Text "/fooo")
-                , ("error", Json.Text "expected type: integer")
-                ]
-            , Json.Object
-                [ ("valid", Json.Boolean true)
-                , ( "keywordLocation"
-                  , Json.Text "/patternProperties/f.*o/type"
+                , ("instanceLocation", Json.Text "")
+                , ( "errors"
+                  , Json.Array
+                      [ Json.Object
+                          [ ("valid", Json.Boolean true)
+                          , ( "keywordLocation"
+                            , Json.Text
+                                "/patternProperties/f.*o"
+                            )
+                          , ( "instanceLocation"
+                            , Json.Text "/foo"
+                            )
+                          , ( "annotations"
+                            , Json.Array
+                                [ Json.Object
+                                    [ ( "valid"
+                                      , Json.Boolean true
+                                      )
+                                    , ( "keywordLocation"
+                                      , Json.Text
+                                          "/patternProperties/f.*o/type"
+                                      )
+                                    , ( "instanceLocation"
+                                      , Json.Text "/foo"
+                                      )
+                                    ]
+                                ]
+                            )
+                          ]
+                      , Json.Object
+                          [ ("valid", Json.Boolean false)
+                          , ( "keywordLocation"
+                            , Json.Text "/patternProperties"
+                            )
+                          , ("instanceLocation", Json.Text "")
+                          , ( "errors"
+                            , Json.Array
+                                [ Json.Object
+                                    [ ( "valid"
+                                      , Json.Boolean false
+                                      )
+                                    , ( "keywordLocation"
+                                      , Json.Text
+                                          "/patternProperties/f.*o"
+                                      )
+                                    , ( "instanceLocation"
+                                      , Json.Text "/fooo"
+                                      )
+                                    , ( "errors"
+                                      , Json.Array
+                                          [ Json.Object
+                                              [ ( "valid"
+                                                , Json.Boolean
+                                                    false
+                                                )
+                                              , ( "keywordLocation"
+                                                , Json.Text
+                                                    "/patternProperties/f.*o/type"
+                                                )
+                                              , ( "instanceLocation"
+                                                , Json.Text
+                                                    "/fooo"
+                                                )
+                                              , ( "error"
+                                                , Json.Text
+                                                    "expected type: integer"
+                                                )
+                                              ]
+                                          ]
+                                      )
+                                    ]
+                                ]
+                            )
+                          ]
+                      , Json.Object
+                          [ ("valid", Json.Boolean true)
+                          , ( "keywordLocation"
+                            , Json.Text
+                                "/patternProperties/f.*o"
+                            )
+                          , ( "instanceLocation"
+                            , Json.Text "/foooo"
+                            )
+                          , ( "annotations"
+                            , Json.Array
+                                [ Json.Object
+                                    [ ( "valid"
+                                      , Json.Boolean true
+                                      )
+                                    , ( "keywordLocation"
+                                      , Json.Text
+                                          "/patternProperties/f.*o/type"
+                                      )
+                                    , ( "instanceLocation"
+                                      , Json.Text "/foooo"
+                                      )
+                                    ]
+                                ]
+                            )
+                          ]
+                      ]
                   )
-                , ("instanceLocation", Json.Text "/foooo")
                 ]
             ]
         )
