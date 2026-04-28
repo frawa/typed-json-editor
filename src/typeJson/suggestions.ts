@@ -76,7 +76,7 @@ export function suggestionsToCompletionItems(
       kind: languages.CompletionItemKind.Value,
       label: {
         label,
-        detail: keyword,
+        detail: " " + keyword,
         description: labelDetail,
         // description: keyword,
         // detail: labelDetail,
