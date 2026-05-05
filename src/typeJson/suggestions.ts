@@ -90,7 +90,7 @@ export function suggestionsToCompletionItems(
     };
     return item;
   };
-  const items = toValueWithMeta(suggestions).flatMap(propertyNamesOnly).map(go);
+  const items = distinct(i => i.value, toValueWithMeta(suggestions).flatMap(propertyNamesOnly)).map(go);
   return [...items];
 }
 
@@ -138,4 +138,9 @@ function groupBy<K, V>(
     }
   });
   return result;
+}
+
+function distinct<T, K>(by: (v: T) => K, vs: readonly T[]): readonly T[] {
+  const keys = vs.map(by)
+  return vs.filter((v, i) => keys.indexOf(by(v)) == i);
 }
