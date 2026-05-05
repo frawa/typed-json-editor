@@ -82,6 +82,7 @@ export function App(props: AppProps): React.ReactElement {
             <option value="test-schema-7">if/then/else</option>
             <option value="test-schema-8">Array Items</option>
             <option value="polymorphism">Polymorphism</option>
+            <option value="polymorphism-propertyDependencies">Polymorphism v1</option>
           </select>
         </div>
       </div>

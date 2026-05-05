@@ -200,6 +200,67 @@ export const sampleSchemas = {
       },
     },
   },
+  'polymorphism-propertyDependencies':{
+    $schema: 'https://json-schema.org/v1',
+    $id: 'http://schema.animal.Animal',
+    type: 'object',
+    propertyDependencies: {
+      "what": {
+        "schema.animal.Lion": {
+          $ref: '#/$defs/schema.animal.Lion',
+        },
+        "schema.animal.Elephant": {
+          $ref: '#/$defs/schema.animal.Elephant',
+        }
+      }
+    },
+    $defs: {
+      'schema.animal.Animal': {
+        properties: {
+          name: {
+            type: ['string', 'null'],
+          },
+          sound: {
+            type: ['string', 'null'],
+          },
+          type: {
+            type: ['string', 'null'],
+          },
+          endangered: {
+            type: 'boolean',
+          },
+        },
+      },
+      'schema.animal.Lion': {
+        allOf: [
+          {
+            $ref: '#/$defs/schema.animal.Animal',
+          },
+        ],
+        properties: {
+          mane: {
+            type: 'boolean',
+          },
+        },
+      },
+      'schema.animal.Elephant': {
+        allOf: [
+          {
+            $ref: '#/$defs/schema.animal.Animal',
+          },
+        ],
+        properties: {
+          trunkLength: {
+            type: 'number',
+            format: 'double',
+          },
+          tusk: {
+            type: 'boolean',
+          },
+        },
+      },
+    },
+  },
   'test-schema-8': {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     prefixItems: [
